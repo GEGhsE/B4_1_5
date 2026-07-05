@@ -1,0 +1,3323 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POP! 국어사전 (낱말의 종류와 기본형)</title>
+
+  <!-- 글꼴은 외부 link 만 허용 (끊겨도 기본 글꼴로 정상 동작) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+  <!--
+    ====================================================================
+    유틸리티 CSS (자체 구현)
+      · 외부 CDN(예: Tailwind 등) 의존성 제거를 위해, 화면에서 실제 사용 중인
+        유틸리티 클래스를 직접 정의한다. 끊길 외부 자원 없음 → 학생 기기에서도
+        오프라인/사내망 등 환경에 영향 없이 동일하게 동작한다.
+      · 색상 / 간격 스케일은 가독성 / 변환 정확도를 위해 일반적인 표준값을 따른다.
+    ====================================================================
+  -->
+  <style>
+    /* ── 색상 변수 (자주 쓰는 톤만) ── */
+    :root {
+      --c-white: #ffffff;
+      --c-black: #000000;
+      --c-gray-50: #f9fafb;
+      --c-gray-100: #f3f4f6;
+      --c-gray-200: #e5e7eb;
+      --c-gray-300: #d1d5db;
+      --c-gray-400: #9ca3af;
+      --c-gray-500: #6b7280;
+      --c-gray-600: #4b5563;
+      --c-gray-700: #374151;
+      --c-gray-800: #1f2937;
+      --c-indigo-50: #eef2ff;
+      --c-indigo-100: #e0e7ff;
+      --c-indigo-200: #c7d2fe;
+      --c-indigo-300: #a5b4fc;
+      --c-indigo-500: #6366f1;
+      --c-indigo-600: #4f46e5;
+      --c-indigo-700: #4338ca;
+      --c-indigo-900: #312e81;
+      --c-orange-50: #fff7ed;
+      --c-orange-100: #ffedd5;
+      --c-orange-200: #fed7aa;
+      --c-orange-300: #fdba74;
+      --c-orange-500: #f97316;
+      --c-orange-600: #ea580c;
+      --c-orange-700: #c2410c;
+      --c-yellow-50: #fefce8;
+      --c-yellow-100: #fef9c3;
+      --c-yellow-300: #fde047;
+      --c-green-100: #dcfce7;
+      --c-green-300: #86efac;
+      --c-green-700: #15803d;
+      --c-red-100: #fee2e2;
+      --c-red-200: #fecaca;
+      --c-red-500: #ef4444;
+      --c-red-600: #dc2626;
+      --c-blue-50:  #eff6ff;
+    }
+
+    /* ── 디스플레이 ── */
+    .hidden { display: none !important; }
+    .block { display: block; }
+    .inline-block { display: inline-block; }
+    .flex { display: flex; }
+    .inline-flex { display: inline-flex; }
+    .grid { display: grid; }
+    .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+
+    /* ── 정렬/위치 ── */
+    .fixed { position: fixed; }
+    .absolute { position: absolute; }
+    .relative { position: relative; }
+    .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+    .top-4 { top: 1rem; }
+    .right-4 { right: 1rem; }
+    .-top-3 { top: -0.75rem; }
+    .-top-4 { top: -1rem; }
+    .-left-3 { left: -0.75rem; }
+    .-right-3 { right: -0.75rem; }
+    .-translate-x-1\/2 { transform: translateX(-50%); }
+    .left-1\/2 { left: 50%; }
+
+    /* ── flex / grid 정렬 ── */
+    .flex-1 { flex: 1 1 0%; }
+    .flex-col { flex-direction: column; }
+    .flex-nowrap { flex-wrap: nowrap; }
+    .flex-wrap { flex-wrap: wrap; }
+    .flex-shrink-0 { flex-shrink: 0; }
+    .items-baseline { align-items: baseline; }
+    .items-center { align-items: center; }
+    .items-stretch { align-items: stretch; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .justify-end { justify-content: flex-end; }
+
+    /* ── 간격(gap / margin / padding) — 0.25rem 단위 ── */
+    .gap-1 { gap: 0.25rem; }
+    .gap-1\.5 { gap: 0.375rem; }
+    .gap-2 { gap: 0.5rem; }
+    .gap-3 { gap: 0.75rem; }
+    .gap-4 { gap: 1rem; }
+    .gap-6 { gap: 1.5rem; }
+    .gap-x-4 { column-gap: 1rem; }
+
+    .p-0 { padding: 0; }
+    .p-2 { padding: 0.5rem; }
+    .p-3 { padding: 0.75rem; }
+    .p-4 { padding: 1rem; }
+    .p-5 { padding: 1.25rem; }
+    .p-6 { padding: 1.5rem; }
+    .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    .px-5 { padding-left: 1.25rem; padding-right: 1.25rem; }
+    .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .px-10 { padding-left: 2.5rem; padding-right: 2.5rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+    .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+    .py-6 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+    .py-8 { padding-top: 2rem; padding-bottom: 2rem; }
+    .pl-5 { padding-left: 1.25rem; }
+    .pr-1 { padding-right: 0.25rem; }
+    .pt-3 { padding-top: 0.75rem; }
+    .pb-1 { padding-bottom: 0.25rem; }
+    .pb-2 { padding-bottom: 0.5rem; }
+
+    .mb-1 { margin-bottom: 0.25rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 0.75rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mb-5 { margin-bottom: 1.25rem; }
+    .mb-6 { margin-bottom: 1.5rem; }
+    .mb-8 { margin-bottom: 2rem; }
+    .mt-0\.5 { margin-top: 0.125rem; }
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-3 { margin-top: 0.75rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mt-5 { margin-top: 1.25rem; }
+    .mt-6 { margin-top: 1.5rem; }
+    .mt-8 { margin-top: 2rem; }
+    .mr-3 { margin-right: 0.75rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+
+    /* 공간 분리: space-y-* */
+    .space-y-1 > * + * { margin-top: 0.25rem; }
+    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .space-y-3 > * + * { margin-top: 0.75rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+
+    /* ── 크기 ── */
+    .w-full { width: 100%; }
+    .w-3 { width: 0.75rem; }
+    .w-24 { width: 6rem; }
+    .w-32 { width: 8rem; }
+    .h-3 { height: 0.75rem; }
+    .h-5 { height: 1.25rem; }
+    .min-h-screen { min-height: 100vh; }
+    .min-h-\[1\.2em\] { min-height: 1.2em; }
+    .min-h-\[1\.5em\] { min-height: 1.5em; }
+    .min-h-\[220px\] { min-height: 220px; }
+    .min-h-\[230px\] { min-height: 230px; }
+    .min-h-\[350px\] { min-height: 350px; }
+    .min-w-0 { min-width: 0; }
+    .min-w-\[140px\] { min-width: 140px; }
+    .max-w-md { max-width: 28rem; }
+    .max-w-sm { max-width: 24rem; }
+    .max-w-xs { max-width: 20rem; }
+    .max-w-xl { max-width: 36rem; }
+    .max-w-4xl { max-width: 56rem; }
+    .max-w-5xl { max-width: 64rem; }
+    .max-w-6xl { max-width: 72rem; }
+    .max-h-72 { max-height: 18rem; }
+
+    /* ── 색상 ── */
+    .bg-white { background-color: var(--c-white); }
+    .bg-black { background-color: var(--c-black); }
+    .bg-gray-50 { background-color: var(--c-gray-50); }
+    .bg-gray-200 { background-color: var(--c-gray-200); }
+    .bg-indigo-50 { background-color: var(--c-indigo-50); }
+    .bg-indigo-100 { background-color: var(--c-indigo-100); }
+    .bg-orange-50 { background-color: var(--c-orange-50); }
+    .bg-orange-100 { background-color: var(--c-orange-100); }
+    .bg-orange-500 { background-color: var(--c-orange-500); }
+    .bg-green-100 { background-color: var(--c-green-100); }
+    .bg-red-100 { background-color: var(--c-red-100); }
+    .bg-yellow-50 { background-color: var(--c-yellow-50); }
+    .bg-yellow-100 { background-color: var(--c-yellow-100); }
+
+    /* var(--*) 직접 사용 — 원본 마크업이 [var(--indigo)] 같은 임의값을 쓰기 때문 */
+    .bg-\[var\(--indigo\)\] { background-color: var(--indigo); }
+    .bg-\[var\(--orange\)\] { background-color: var(--orange); }
+    .bg-\[var\(--yellow\)\] { background-color: var(--yellow); }
+
+    /* 그라데이션 — gradient-to-br / gradient-to-r 만 사용됨 */
+    .bg-gradient-to-br { background-image: linear-gradient(to bottom right, var(--tw-grad-from, transparent), var(--tw-grad-to, transparent)); }
+    .bg-gradient-to-r  { background-image: linear-gradient(to right,         var(--tw-grad-from, transparent), var(--tw-grad-to, transparent)); }
+    .from-blue-50           { --tw-grad-from: var(--c-blue-50); }
+    .to-indigo-50           { --tw-grad-to:   var(--c-indigo-50); }
+    .from-\[var\(--indigo\)\] { --tw-grad-from: var(--indigo); }
+    .to-\[var\(--orange\)\]   { --tw-grad-to:   var(--orange); }
+
+    /* 글씨 색 */
+    .text-white { color: var(--c-white); }
+    .text-white\/80 { color: rgba(255,255,255,0.8); }
+    .text-gray-300 { color: var(--c-gray-300); }
+    .text-gray-400 { color: var(--c-gray-400); }
+    .text-gray-500 { color: var(--c-gray-500); }
+    .text-gray-600 { color: var(--c-gray-600); }
+    .text-gray-700 { color: var(--c-gray-700); }
+    .text-gray-800 { color: var(--c-gray-800); }
+    .text-indigo-600 { color: var(--c-indigo-600); }
+    .text-indigo-700 { color: var(--c-indigo-700); }
+    .text-indigo-900 { color: var(--c-indigo-900); }
+    .text-orange-600 { color: var(--c-orange-600); }
+    .text-orange-700 { color: var(--c-orange-700); }
+    .text-green-700 { color: var(--c-green-700); }
+    .text-red-500 { color: var(--c-red-500); }
+    .text-red-600 { color: var(--c-red-600); }
+    .text-\[var\(--indigo\)\] { color: var(--indigo); }
+    .text-\[var\(--orange\)\] { color: var(--orange); }
+    .text-\[var\(--ink\)\]    { color: var(--ink); }
+
+    /* ── 테두리 ── */
+    .border { border: 1px solid currentColor; }
+    .border-2 { border: 2px solid currentColor; }
+    .border-4 { border: 4px solid currentColor; }
+    .border-5 { border: 5px solid currentColor; }
+    .border-b   { border-bottom: 1px solid currentColor; }
+    .border-b-2 { border-bottom: 2px solid currentColor; }
+    .border-b-4 { border-bottom: 4px solid currentColor; }
+    .border-t-2 { border-top: 2px solid currentColor; }
+    .border-dashed { border-style: dashed; }
+    /* border-{color} 클래스는 currentColor 를 덮어쓰기 위한 보조 */
+    .border-black { border-color: var(--c-black) !important; }
+    .border-gray-100 { border-color: var(--c-gray-100) !important; }
+    .border-gray-200 { border-color: var(--c-gray-200) !important; }
+    .border-gray-300 { border-color: var(--c-gray-300) !important; }
+    .border-indigo-200 { border-color: var(--c-indigo-200) !important; }
+    .border-indigo-300 { border-color: var(--c-indigo-300) !important; }
+    .border-orange-200 { border-color: var(--c-orange-200) !important; }
+    .border-orange-300 { border-color: var(--c-orange-300) !important; }
+    .border-red-200    { border-color: var(--c-red-200) !important; }
+    .border-green-300  { border-color: var(--c-green-300) !important; }
+    .border-\[var\(--indigo\)\] { border-color: var(--indigo) !important; }
+    .border-\[var\(--orange\)\] { border-color: var(--orange) !important; }
+
+    /* ── 모서리 ── */
+    .rounded { border-radius: 0.25rem; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-2xl { border-radius: 1rem; }
+    .rounded-3xl { border-radius: 1.5rem; }
+    .rounded-full { border-radius: 9999px; }
+
+    /* ── 그림자 ── */
+    .shadow      { box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1); }
+    .shadow-sm   { box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+    .shadow-md   { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    .shadow-lg   { box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1); }
+    .shadow-\[3px_3px_0_\#000\] { box-shadow: 3px 3px 0 #000; }
+    .shadow-\[6px_6px_0_\#000\] { box-shadow: 6px 6px 0 #000; }
+    .shadow-\[8px_8px_0_\#000\] { box-shadow: 8px 8px 0 #000; }
+
+    /* ── 글자 크기 / 무게 / 행간 ── */
+    .text-xs   { font-size: 0.75rem;   line-height: 1rem; }
+    .text-sm   { font-size: 0.875rem;  line-height: 1.25rem; }
+    .text-base { font-size: 1rem;      line-height: 1.5rem; }
+    .text-lg   { font-size: 1.125rem;  line-height: 1.75rem; }
+    .text-xl   { font-size: 1.25rem;   line-height: 1.75rem; }
+    .text-2xl  { font-size: 1.5rem;    line-height: 2rem; }
+    .text-3xl  { font-size: 1.875rem;  line-height: 2.25rem; }
+    .text-4xl  { font-size: 2.25rem;   line-height: 2.5rem; }
+    .text-5xl  { font-size: 3rem;      line-height: 1; }
+    .text-6xl  { font-size: 3.75rem;   line-height: 1; }
+    .text-\[11px\] { font-size: 11px; }
+
+    .font-normal { font-weight: 400; }
+    .font-semibold { font-weight: 600; }
+    .font-bold { font-weight: 700; }
+    .font-black { font-weight: 900; }
+
+    .leading-snug    { line-height: 1.375; }
+    .leading-tight   { line-height: 1.25; }
+    .leading-relaxed { line-height: 1.625; }
+    .leading-loose   { line-height: 2; }
+    .tracking-tight { letter-spacing: -0.025em; }
+    .tracking-wider { letter-spacing: 0.05em; }
+
+    /* ── 텍스트 정렬 / 강제 줄바꿈 / 말줄임 ── */
+    .text-center { text-align: center; }
+    .text-left { text-align: left; }
+    .text-right { text-align: right; }
+    .whitespace-nowrap { white-space: nowrap; }
+    .text-ellipsis { text-overflow: ellipsis; }
+    .break-keep { word-break: keep-all; overflow-wrap: anywhere; }
+    .underline { text-decoration: underline; }
+    .italic { font-style: italic; }
+    .list-disc { list-style-type: disc; }
+
+    /* ── 오버플로 ── */
+    .overflow-hidden { overflow: hidden; }
+    .overflow-y-auto { overflow-y: auto; }
+
+    /* ── 투명도 / 변환 / 트랜지션 ── */
+    .opacity-10 { opacity: 0.1; }
+    .opacity-20 { opacity: 0.2; }
+    .opacity-80 { opacity: 0.8; }
+    .opacity-90 { opacity: 0.9; }
+    .pointer-events-none { pointer-events: none; }
+    .transform { transform: translateZ(0); }
+    .transition-all       { transition-property: all;       transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .transition-colors    { transition-property: color, background-color, border-color; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
+    .duration-500 { transition-duration: 500ms; }
+    .ease-out { transition-timing-function: cubic-bezier(0, 0, 0.2, 1); }
+    .hover\:scale-105:hover { transform: scale(1.05); }
+
+    /* ── pulse 애니메이션 (Tailwind 의 animate-pulse 와 동일) ── */
+    @keyframes a-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .animate-pulse { animation: a-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+    /* ── z-index ── */
+    .z-10  { z-index: 10; }
+    .z-20  { z-index: 20; }
+    .z-30  { z-index: 30; }
+    .z-\[200\] { z-index: 200; }
+    .z-\[300\] { z-index: 300; }
+
+    /* ── 반응형 (md: 768px 이상) ── */
+    @media (min-width: 768px) {
+      .md\:flex-row { flex-direction: row; }
+      .md\:items-center { align-items: center; }
+      .md\:justify-between { justify-content: space-between; }
+      .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .md\:grid-cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      .md\:col-span-2 { grid-column: span 2 / span 2; }
+      .md\:col-span-3 { grid-column: span 3 / span 3; }
+      .md\:gap-3 { gap: 0.75rem; }
+      .md\:gap-5 { gap: 1.25rem; }
+      .md\:gap-8 { gap: 2rem; }
+      .md\:p-4 { padding: 1rem; }
+      .md\:p-5 { padding: 1.25rem; }
+      .md\:p-6 { padding: 1.5rem; }
+      .md\:p-7 { padding: 1.75rem; }
+      .md\:p-8 { padding: 2rem; }
+      .md\:mb-7 { margin-bottom: 1.75rem; }
+      .md\:w-28 { width: 7rem; }
+      .md\:w-36 { width: 9rem; }
+      .md\:w-64 { width: 16rem; }
+      .md\:text-xs   { font-size: 0.75rem; }
+      .md\:text-sm   { font-size: 0.875rem; }
+      .md\:text-base { font-size: 1rem; }
+      .md\:text-lg   { font-size: 1.125rem; }
+      .md\:text-xl   { font-size: 1.25rem; }
+      .md\:text-2xl  { font-size: 1.5rem; }
+      .md\:text-3xl  { font-size: 1.875rem; }
+      .md\:text-4xl  { font-size: 2.25rem; }
+      .md\:text-6xl  { font-size: 3.75rem; }
+      .md\:text-7xl  { font-size: 4.5rem; }
+    }
+  </style>
+
+  <!--
+    ====================================================================
+    앱 전용 스타일 (원본 유지)
+      · 위 유틸리티가 일반 클래스(font-, text-, bg- 등) 를 담당하고,
+        아래는 retro-box / retro-btn / 모달 / 콘페티(폭죽) 등 앱 고유 스타일
+    ====================================================================
+  -->
+  <style>
+    :root {
+      --bg: #FFF7ED;
+      --ink: #000;
+      --indigo: #6366F1;
+      --orange: #F97316;
+      --yellow: #FDE047;
+      --shadow: 4px 4px 0 var(--ink);
+      --border: 3px solid var(--ink);
+      --r-xl: 24px;
+      --r-2xl: 28px;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Noto Sans KR", system-ui, -apple-system, Segoe UI, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .retro-box {
+      border: var(--border);
+      border-radius: var(--r-2xl);
+      box-shadow: var(--shadow);
+      background: #fff;
+    }
+
+    .retro-box.soft { background: rgba(255, 255, 255, 0.85); }
+
+    .retro-btn {
+      border: var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      font-weight: 900;
+      padding: 14px 16px;
+      transition: transform .12s ease, box-shadow .12s ease;
+      user-select: none;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .retro-btn:hover {
+      transform: translate(-1px, -1px);
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+
+    .retro-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .btn-primary  { background: var(--orange); color: #fff; }
+    .btn-secondary{ background: var(--yellow); color: #111; }
+    .btn-ghost    { background: #fff; color: #111; }
+    .btn-indigo   { background: var(--indigo); color: #fff; }
+    .btn-disabled { opacity: .55; filter: grayscale(.8); pointer-events: none; }
+
+    .chip {
+      border: var(--border);
+      border-radius: 999px;
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 8px 12px;
+      font-weight: 900;
+      background: #fff;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    .chip.selected { background: var(--indigo); color: #fff; transform: scale(1.05); }
+
+    .badge {
+      border: var(--border);
+      border-radius: 16px;
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 6px 10px;
+      font-weight: 900;
+      background: #E0E7FF;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge .pop {
+      background: var(--indigo);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+    }
+
+    .shake { animation: shake .28s linear; }
+    @keyframes shake {
+      0%   { transform: translateX(0); }
+      25%  { transform: translateX(-6px); }
+      50%  { transform: translateX(6px); }
+      75%  { transform: translateX(-4px); }
+      100% { transform: translateX(0); }
+    }
+
+    .slide-in { animation: slideIn 0.3s ease-out forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* 모달 */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center; justify-content: center;
+      padding: 18px;
+      z-index: 50;
+      backdrop-filter: blur(2px);
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal-panel {
+      width: min(720px, 100%);
+      border: var(--border);
+      border-radius: var(--r-2xl);
+      box-shadow: 8px 8px 0 var(--ink);
+      background: #fff;
+      overflow: hidden;
+      animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes popUp {
+      from { transform: scale(0.9); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    /* 토스트 */
+    .toast-wrap {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: 18px; z-index: 60; pointer-events: none;
+    }
+    .toast {
+      border: var(--border);
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      background: #fff;
+      padding: 10px 14px;
+      font-weight: 900;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* 폭죽 (콘페티) — 화면 내 작은 효과 */
+    .confetti-layer {
+      position: absolute; inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      display: none;
+    }
+    .confetti-layer.show { display: block; }
+    .confetti {
+      position: absolute;
+      width: 10px; height: 14px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+      border-radius: 4px;
+      animation: pop .9s ease-out forwards;
+    }
+    @keyframes pop {
+      0%   { transform: translateY(0)    rotate(0deg);   opacity: 1; }
+      100% { transform: translateY(240px) rotate(540deg); opacity: 0; }
+    }
+
+    .retro-input {
+      width: 100%;
+      border: var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 800;
+      outline: none;
+    }
+
+    .kicker { letter-spacing: 0.08em; font-weight: 900; color: #9A3412; }
+    .muted  { color: rgba(0, 0, 0, 0.65); }
+
+    .progress-outer {
+      height: 16px;
+      border: var(--border);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 3px 3px 0 var(--ink);
+      overflow: hidden;
+    }
+    .progress-inner {
+      height: 100%;
+      background: var(--indigo);
+      width: 0%;
+      transition: width .25s ease;
+    }
+
+    /* 핵심 키워드 강조 */
+    .kw-name {
+      background: #C7D2FE; color: #3730A3;
+      padding: 2px 10px; border-radius: 8px;
+      font-weight: 900; border: 2px solid #6366F1;
+      box-shadow: 2px 2px 0 #000;
+      display: inline-block; margin: 2px 0;
+    }
+    .kw-action {
+      background: #FED7AA; color: #9A3412;
+      padding: 2px 10px; border-radius: 8px;
+      font-weight: 900; border: 2px solid #F97316;
+      box-shadow: 2px 2px 0 #000;
+      display: inline-block; margin: 2px 0;
+    }
+    .kw-state {
+      background: #BBF7D0; color: #166534;
+      padding: 2px 10px; border-radius: 8px;
+      font-weight: 900; border: 2px solid #16A34A;
+      box-shadow: 2px 2px 0 #000;
+      display: inline-block; margin: 2px 0;
+    }
+    .kw-hl {
+      background: #FEF08A; color: #854D0E;
+      padding: 1px 6px; border-radius: 6px;
+      font-weight: 900; border-bottom: 3px solid #CA8A04;
+    }
+    .kw-base {
+      background: #FCE7F3; color: #9F1239;
+      padding: 2px 8px; border-radius: 6px;
+      font-weight: 900; border: 2px dashed #DB2777;
+      display: inline-block;
+    }
+    .kw-ex {
+      color: #6B7280; font-weight: 600;
+      font-size: 0.85em; white-space: nowrap;
+    }
+    .kw-dash {
+      color: #9CA3AF; margin: 0 6px; font-weight: 700;
+    }
+
+    /* 3단계: 학생이 다음에 해야 할 박스 강조 */
+    .step-active {
+      background: #FFFBEB !important;
+      position: relative;
+      z-index: 2;
+      animation: stepGlow 1.6s ease-in-out infinite;
+    }
+    .step-active .step-badge { display: inline-flex; }
+    .step-badge {
+      display: none;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.72rem;
+      background: var(--orange);
+      color: #fff;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 2px solid var(--ink);
+      box-shadow: 2px 2px 0 var(--ink);
+      font-weight: 900;
+      animation: badgeBounce 1.2s ease-in-out infinite;
+    }
+    @keyframes stepGlow {
+      0%, 100% { box-shadow: 4px 4px 0 var(--ink), 0 0 0 4px var(--orange), 0 0 0 8px rgba(249, 115, 22, 0.35); }
+      50%      { box-shadow: 4px 4px 0 var(--ink), 0 0 0 4px var(--orange), 0 0 0 14px rgba(249, 115, 22, 0); }
+    }
+    @keyframes badgeBounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-2px); }
+    }
+
+    /* 피드백 모달 본문에서 **텍스트** 강조 */
+    .fb-strong {
+      display: inline-block;
+      font-weight: 900;
+      color: #4338CA;
+      background: rgba(99, 102, 241, 0.10);
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    /* 결과 보고서: 화려한 폭죽 효과 */
+    .result-confetti-layer {
+      position: fixed; inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 90;
+      display: none;
+    }
+    .result-confetti-layer.show { display: block; }
+    .firework-piece {
+      position: absolute;
+      width: 12px; height: 16px;
+      border: 2px solid var(--ink);
+      border-radius: 4px;
+      box-shadow: 2px 2px 0 var(--ink);
+      animation: fireworkFly 1.8s ease-out forwards;
+      transform: translate(-50%, -50%);
+    }
+    @keyframes fireworkFly {
+      0%   { transform: translate(-50%, -50%) rotate(0deg);  opacity: 1; }
+      60%  { opacity: 1; }
+      100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(540deg); opacity: 0; }
+    }
+
+    /* 결과 보고서: 종류별 진행바 */
+    .type-bar-outer {
+      flex: 1;
+      height: 18px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 2px 2px 0 var(--ink);
+      overflow: hidden;
+      min-width: 80px;
+    }
+    .type-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--indigo), var(--orange));
+      transition: width .6s ease;
+    }
+
+    /* 비활성 다운로드 버튼 */
+    .btn-locked { background: #E5E7EB; color: #6B7280; cursor: not-allowed; }
+    .btn-locked:hover { transform: none; box-shadow: var(--shadow); }
+
+    /* 로그인 / 선생님 설정 오버레이 */
+    .login-bg {
+      background:
+        radial-gradient(circle at 18% 22%, rgba(199, 210, 254, 0.45) 0, transparent 38%),
+        radial-gradient(circle at 82% 78%, rgba(254, 215, 170, 0.45) 0, transparent 38%),
+        linear-gradient(135deg, #FFF7ED 0%, #FFFBEB 50%, #EEF2FF 100%);
+    }
+    .login-card {
+      border: 3px solid #000;
+      border-radius: 28px;
+      box-shadow: 8px 8px 0 #000;
+      background: #fff;
+    }
+    .login-input {
+      width: 100%;
+      border: 3px solid #000;
+      border-radius: 18px;
+      box-shadow: 4px 4px 0 #000;
+      padding: 14px 16px;
+      font-size: 18px;
+      font-weight: 800;
+      outline: none;
+      background: #fff;
+    }
+    .login-input:focus { border-color: #6366F1; }
+    .login-btn {
+      border: 3px solid #000;
+      border-radius: 18px;
+      box-shadow: 4px 4px 0 #000;
+      font-weight: 900;
+      padding: 14px 16px;
+      transition: transform .12s ease, box-shadow .12s ease;
+      background: #F97316;
+      color: #fff;
+      width: 100%;
+      font-size: 20px;
+    }
+    .login-btn:hover  { transform: translate(-1px,-1px); box-shadow: 6px 6px 0 #000; }
+    .login-btn:active { transform: translate(2px,2px);   box-shadow: 2px 2px 0 #000; }
+    .login-btn:disabled { opacity: .55; filter: grayscale(.6); cursor: not-allowed; }
+
+    /* 데모(체험) 모드 안내 배지 */
+    .demo-banner {
+      background: #FEF3C7;
+      border: 2px solid #F59E0B;
+      color: #92400E;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .demo-pill {
+      display: inline-block;
+      background: #F59E0B;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      letter-spacing: 0.04em;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- ===== 학생 입장 오버레이 ===== -->
+  <div id="loginOverlay" class="fixed inset-0 z-[200] flex items-center justify-center p-4 overflow-hidden login-bg">
+
+    <div class="login-card w-full max-w-md p-6 md:p-8 flex flex-col items-center gap-4 md:gap-5 relative z-10">
+      <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-black text-white text-[11px] md:text-xs font-black px-4 py-1 rounded-full tracking-wider whitespace-nowrap shadow-md">
+        📚 국어 학습
+      </div>
+
+      <div class="flex items-center justify-center gap-1.5 mt-3">
+        <span class="bg-indigo-100 text-indigo-700 font-black text-base md:text-lg px-2.5 py-1 rounded-lg border-2 border-indigo-300 shadow-sm">이름</span>
+        <span class="text-gray-300 text-base">·</span>
+        <span class="bg-orange-100 text-orange-700 font-black text-base md:text-lg px-2.5 py-1 rounded-lg border-2 border-orange-300 shadow-sm">움직임</span>
+        <span class="text-gray-300 text-base">·</span>
+        <span class="bg-green-100 text-green-700 font-black text-base md:text-lg px-2.5 py-1 rounded-lg border-2 border-green-300 shadow-sm">상태</span>
+      </div>
+
+      <div class="text-center">
+        <h2 class="text-2xl md:text-3xl font-black text-indigo-900 leading-tight tracking-tight">
+          낱말의 <span class="text-orange-600">종류와 기본형</span><br>이해하기
+        </h2>
+        <!-- 데모 모드일 때 표시될 배지 (JS에서 토글) -->
+        <div id="demoPill" class="demo-pill" style="display:none;">체험 모드</div>
+        <div id="loginModeLabel" class="mt-3 inline-flex items-center gap-1.5 bg-indigo-50 px-3 py-1 rounded-full text-xs md:text-sm font-bold text-indigo-600 border-2 border-indigo-200">
+          🔑 학습자 입장
+        </div>
+      </div>
+
+      <div class="w-full flex flex-col gap-3">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold text-gray-600" for="studentSelect">학생 선택</label>
+          <select id="studentSelect" class="login-input">
+            <option value="">학생을 선택하세요</option>
+          </select>
+        </div>
+      </div>
+      <div id="loginError" class="text-red-500 font-bold text-sm hidden">학생을 선택해 주세요.</div>
+      <button id="btnLogin" class="login-btn">입장하기 🚀</button>
+      <p id="loginHint" class="text-xs text-gray-400 font-bold text-center">선생님이 등록한 명단에서 선택하세요.</p>
+
+      <!-- '선생님 설정' 진입 링크 — 시작/입장 버튼 바로 아래에 배치
+           학생용 링크(#c=)로 접속한 경우, JS 가 이 버튼 자체를 DOM 에서 제거한다. -->
+      <button id="loginSettingsLink" type="button"
+        class="text-xs text-gray-400 font-bold underline"
+        style="background:none;border:none;cursor:pointer;">선생님 설정</button>
+
+      <!-- 데모 안내(중복) 제거 — 바닥 체험 배너로 통일. JS 참조 보존 위해 빈 요소만 유지 -->
+      <div id="demoBanner" style="display:none"></div>
+    </div>
+  </div>
+
+  <!-- ===== 선생님 설정 오버레이 (자료 주소 입력/관리) ===== -->
+  <div id="settingsOverlay" class="fixed inset-0 z-[300] flex items-center justify-center p-4 overflow-hidden login-bg"
+    style="display:none;">
+    <div class="login-card w-full max-w-md p-6 md:p-8 flex flex-col gap-4 relative z-10">
+      <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-black text-white text-[11px] md:text-xs font-black px-4 py-1 rounded-full tracking-wider whitespace-nowrap shadow-md">
+        선생님 설정
+      </div>
+
+      <div class="text-center mt-3">
+        <h2 class="text-2xl font-black text-indigo-900 leading-tight">학습 자료 연결</h2>
+        <p id="settingsIntro" class="mt-2 text-sm font-bold text-gray-500 break-keep"></p>
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label class="text-sm font-bold text-gray-600" for="endpointInput">연결 주소</label>
+        <input id="endpointInput" class="login-input" style="font-size:14px;"
+          placeholder="https://script.google.com/.../exec" />
+      </div>
+
+      <button id="btnSaveEndpoint" class="login-btn">연결하기</button>
+      <div id="settingsMsg" class="text-sm font-bold text-center min-h-[1.2em] break-keep" style="color:#6B7280;"></div>
+
+      <!-- 주소가 저장된 뒤에만 보이는 영역: 학생용 링크 / 연결 해제 -->
+      <div id="settingsExtra" class="flex-col gap-3 pt-3 border-t-2 border-gray-100" style="display:none;">
+        <div class="flex flex-col gap-1">
+          <label class="text-sm font-bold text-gray-600" for="studentLink">학생용 링크</label>
+          <input id="studentLink" class="login-input" style="font-size:12px;" readonly />
+          <p class="text-xs text-gray-400 font-bold break-keep">이 링크를 학생들에게 전달하면, 학생 기기에서는 별도 설정 없이 바로 접속돼요.</p>
+        </div>
+        <button id="btnCopyLink" class="retro-btn btn-indigo w-full text-sm">학생용 링크 복사</button>
+        <button id="btnClearEndpoint" class="retro-btn btn-ghost w-full text-sm">연결 해제</button>
+      </div>
+
+      <button id="btnCloseSettings" class="retro-btn btn-ghost w-full text-sm" style="display:none;">닫기</button>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto p-4 md:p-6">
+    <!-- 헤더 -->
+    <header class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex items-center gap-3">
+        <div class="font-black text-xl md:text-2xl text-[var(--ink)] tracking-tight">낱말의 종류와 기본형 이해하기</div>
+      </div>
+      <div id="headerActions" class="flex flex-wrap items-center gap-2 justify-end">
+        <button id="btnGlobalHome" class="retro-btn btn-ghost text-sm md:text-base hidden"
+          onclick="window.goHomeCheck()">🏠 처음으로</button>
+        <button id="btnHelp" class="retro-btn btn-secondary text-sm md:text-base">활동 안내</button>
+        <button id="btnGlobalEnd" class="retro-btn btn-ghost text-sm md:text-base hidden" onclick="renderResult()">🏳️ 그만하기</button>
+      </div>
+    </header>
+
+    <!-- 메인 -->
+    <main class="retro-box p-4 md:p-6">
+      <section id="statusBar" class="retro-box soft p-3 md:p-4 mb-4 hidden">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge"><span class="pop">계획</span><span id="planText" class="font-black"></span></span>
+            <span class="badge"><span class="pop">단계</span><span id="stageText" class="font-black"></span></span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <div class="text-sm font-black">진행</div>
+              <div class="text-sm muted"><span id="posText">0/0</span></div>
+            </div>
+            <div class="w-32 md:w-64">
+              <div class="progress-outer">
+                <div id="progressInner" class="progress-inner"></div>
+              </div>
+            </div>
+            <div id="timerBox" class="badge hidden"><span class="pop">⏳</span><span id="timerText" class="font-black"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen"></section>
+    </main>
+  </div>
+
+  <!-- 활동 안내 모달 -->
+  <div id="helpModal" class="modal-backdrop">
+    <div class="modal-panel">
+      <div class="p-4 border-b-4 border-black bg-[var(--yellow)] flex justify-between">
+        <h2 class="text-xl font-black">활동 안내</h2>
+        <button id="btnCloseHelp" class="retro-btn btn-ghost text-sm">닫기</button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="retro-box p-4">
+          <div class="font-black text-lg mb-2">1) 낱말의 종류</div>
+          <ul class="list-disc pl-5 font-semibold">
+            <li>① 이름을 나타내는 낱말</li>
+            <li>② 움직임을 나타내는 낱말</li>
+            <li>③ 성질이나 상태를 나타내는 낱말</li>
+          </ul>
+        </div>
+        <div class="retro-box p-4">
+          <div class="font-black text-lg mb-2">2) 기본 모습 찾기</div>
+          <div class="font-semibold">문장에서 모양이 바뀐 말은 사전에 '-다'가 붙은 모습으로 나와요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 다리(Bridge) 모달 -->
+  <div id="bridgeModal" class="modal-backdrop">
+    <div class="modal-panel">
+      <div class="p-5 border-b-4 border-black bg-[var(--indigo)] text-white text-center relative overflow-hidden">
+        <div class="confetti-layer show opacity-20"></div>
+        <div class="kicker text-white/80 mb-1">NEXT STEP</div>
+        <h2 id="bridgeTitle" class="text-2xl font-black relative z-10">참 잘했어요!</h2>
+        <p id="bridgeMsg" class="font-bold mt-2 opacity-90 relative z-10">다음 단계로 넘어갈 준비가 되었나요?</p>
+      </div>
+      <div class="p-6 md:p-8 space-y-6">
+
+        <div id="bridgeGuidance"
+          class="hidden retro-box soft p-5 mb-4 border-4 border-[var(--orange)] bg-orange-50 shadow-md">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-3xl">📢</span>
+            <h3 class="text-xl font-black text-[var(--orange)]">이번 단계 학습 안내</h3>
+          </div>
+          <div class="text-lg font-bold text-gray-800 leading-relaxed" id="bridgeGuidanceText"></div>
+        </div>
+
+        <div class="text-center font-bold text-lg mb-2 text-gray-500">학습 목표를 정해볼까요?</div>
+
+        <div class="max-w-md mx-auto">
+          <div>
+            <div class="text-sm font-black mb-2 text-gray-500 text-center">🧩 문제 개수</div>
+            <div class="flex justify-center gap-2">
+              <button class="chip text-sm py-2 px-4" onclick="setBridgeCount(5)" id="brC5">5개</button>
+              <button class="chip text-sm py-2 px-4 selected" onclick="setBridgeCount(10)" id="brC10">10개</button>
+              <button class="chip text-sm py-2 px-4" onclick="setBridgeCount(15)" id="brC15">15개</button>
+              <button class="chip text-sm py-2 px-4" onclick="setBridgeCount(20)" id="brC20">20개</button>
+            </div>
+          </div>
+        </div>
+
+        <button id="btnBridgeStart" class="retro-btn btn-primary w-full text-xl py-4 shadow-lg animate-pulse mt-4">
+          설계 완료! 시작하기 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 시간 종료 모달 -->
+  <div id="timeModal" class="modal-backdrop">
+    <div class="modal-panel">
+      <div class="p-4 border-b-4 border-black bg-[var(--yellow)]">
+        <h2 class="text-xl font-black">시간 종료!</h2>
+      </div>
+      <div class="p-6 space-y-3">
+        <div class="retro-box p-4 font-semibold">약속한 시간이 지났어요. 그만할까요?</div>
+        <div class="flex gap-3">
+          <button id="btnEndNow" class="retro-btn btn-ghost w-full">종료</button>
+          <button id="btnContinue" class="retro-btn btn-primary w-full">계속하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 확인 모달 -->
+  <div id="confirmModal" class="modal-backdrop">
+    <div class="modal-panel w-full max-w-sm">
+      <div class="p-4 border-b-4 border-black bg-[var(--orange)] text-white">
+        <h2 class="text-xl font-black">잠깐!</h2>
+      </div>
+      <div class="p-6 space-y-4 text-center">
+        <div id="confirmText" class="font-bold text-lg">진행 중인 학습을 종료하고<br />처음으로 돌아갈까요?</div>
+        <div class="flex gap-3">
+          <button id="btnConfirmNo" class="retro-btn btn-ghost w-full">아니오</button>
+          <button id="btnConfirmYes" class="retro-btn btn-primary w-full">네</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 피드백 모달 -->
+  <div id="fbModal" class="modal-backdrop" style="z-index: 100;">
+    <div class="modal-panel max-w-xl text-center p-0">
+      <div id="fbHeader" class="p-4 border-b-4 border-black text-xl font-black text-white"></div>
+      <div class="p-6 md:p-8 space-y-4">
+        <div id="fbIcon" class="text-6xl mb-2"></div>
+        <div id="fbMessage" class="text-xl md:text-2xl font-black leading-snug"></div>
+        <div id="fbDetail"
+          class="text-base md:text-lg font-bold text-gray-700 bg-gray-50 p-4 rounded-xl border-2 border-gray-200 mt-4 leading-relaxed hidden break-keep">
+        </div>
+        <div id="fbHint"
+          class="text-sm md:text-base font-bold text-orange-700 bg-orange-50 p-3 rounded-xl border-2 border-orange-200 mt-3 hidden break-keep text-left">
+        </div>
+
+        <button id="btnFbNext" class="retro-btn w-full mt-6 py-4 text-xl shadow-lg"></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-wrap">
+    <div id="toast" class="toast">알림</div>
+  </div>
+
+<script>
+  /* ===================================================================
+     데이터 — 개념 슬라이드 + 1·2·3단계 기본 문제
+     ===================================================================
+     · 선생님이 연결한 시트(1단계·2단계·3단계 탭)에서 문제를 받아오면
+       applyServerQuestions() 가 아래 기본값을 덮어쓴다.
+     · 서버 응답이 없거나 빈 배열이면 이 기본 문제로 학습이 가능하다.
+  =================================================================== */
+
+  const CONCEPT_SLIDES = [
+    {
+      type: "intro",
+      icon: "🏫",
+      title: "1. 낱말의 종류",
+      desc: "<div class='text-center mb-3'>낱말은 크게 <span class='kw-hl'>세 가지</span>로 나눌 수 있어요.</div><div class='max-w-4xl mx-auto' style='display:grid; grid-template-columns:auto auto 1fr; gap:14px 10px; align-items:center; line-height:1.6;'><span class='kw-name'>① 이름을 나타내는 낱말</span><span class='kw-dash'>—</span><span class='text-left'>사람이나 사물의 이름을 말해요. <span class='kw-ex'>(예: 시계, 강아지, 선생님)</span></span><span class='kw-action'>② 움직임을 나타내는 낱말</span><span class='kw-dash'>—</span><span class='text-left'>'한다' 또는 '움직인다'를 말해요. <span class='kw-ex'>(예: 씻다, 읽다, 보다)</span></span><span class='kw-state'>③ 성질이나 상태를 나타내는 낱말</span><span class='kw-dash'>—</span><span class='text-left'>어떠한지(성질, 느낌, 상태)를 말해요. <span class='kw-ex'>(예: 아름답다, 높다, 검다)</span></span></div>",
+      ex: []
+    },
+    {
+      type: "change",
+      icon: "🔄",
+      title: "2. 모양이 바뀌는 낱말",
+      desc: "<span class='kw-action'>움직임</span><span style='margin:0 3px;'>이나</span><span class='kw-state'>성질·상태</span><span style='margin:0 3px;'>를</span>나타내는 낱말은<br>문장에서 쓰일 때 <span class='kw-hl'>끝부분이 바뀌어요.</span>",
+      ex: ["<span style='color:#6366F1;font-weight:900;'>보다</span> → 보고 / 보면 / 보니", "<span style='color:#6366F1;font-weight:900;'>높다</span> → 높고 / 높으면 / 높다"]
+    },
+    {
+      type: "base_def",
+      icon: "📚",
+      title: "3. 국어사전과 '기본 모습'",
+      desc: "모양이 바뀌어도 국어사전에는<br><span class='kw-base'>'-다'가 붙은 기본 모습</span>으로 실려 있어요.",
+      rule: "문장에 맞게 끝이 달라져도 뜻은 같아요!"
+    },
+    {
+      type: "how_to",
+      icon: "🔍",
+      title: "4. 어떻게 찾을까요?",
+      desc: "문장 속 낱말의 끝이 바뀌어서 사전에 없으면,<br><span class='kw-base'>'-다'가 붙은 기본 모습</span>으로 바꿔서 찾아요.",
+      pairs: [{ from: "보고", to: "보다" }, { from: "높으면", to: "높다" }, { from: "깊은", to: "깊다" }]
+    },
+    {
+      type: "summary",
+      icon: "✅",
+      title: "한 줄 정리",
+      desc: "문장 속 낱말의 끝이 바뀌어서 사전에 없으면,<br><span class='kw-base'>'-다'가 붙은 기본 모습</span>으로 바꿔서 찾는다!",
+      ex: []
+    }
+  ];
+
+  // 1단계: 낱말의 종류 분류하기 — 시트에서 불러오며, 없으면 아래 기본 문제 사용
+  let STAGE1 = [
+    { word: "연필", a: 1, fbOk: "맞아요! '연필'은 우리가 쓰는 물건을 부르는 이름이에요. 사물의 이름을 정확히 아는 것이 문장 만들기의 첫걸음이랍니다!", fbNo: "연필이 스스로 움직이거나 어떤 상태를 나타내지는 않아요. 필통 속에 있는 그 물건을 무엇이라고 '부르는지' 떠올려 보세요.", hint: "🔍 \"이것은 무엇입니까?\"에 대답할 수 있어요." },
+    { word: "달리다", a: 2, fbOk: "정확해요! '달리다'는 몸을 바쁘게 움직이는 동작이에요. 이렇게 움직임을 나타내는 낱말들은 나중에 여러 모양으로 변신할 수 있어요.", fbNo: "가만히 멈춰 있는 물건의 이름일까요? 운동장에서 땀을 흘리며 앞으로 쌩쌩 나아가는 나의 '움직임'을 그려보세요.", hint: "🏃‍♂️ 몸이 직접 '움직이는' 모습을 상상해 보세요." },
+    { word: "예쁘다", a: 3, fbOk: "훌륭합니다! '예쁘다'는 눈에 보이는 모습이나 상태를 나타내요. 움직이지는 않지만, 움직임 낱말처럼 모양이 변할 수 있는 중요한 친구랍니다.", fbNo: "예쁘다'가 직접 팔다리를 움직이는 행동일까요? 예쁜 꽃을 보았을 때 느껴지는 '모습이나 상태'에 가깝다는 걸 기억해 보세요.", hint: "🌸 \"어떤 모습인가요?\"에 어울리는 낱말이에요." },
+    { word: "책상", a: 1, fbOk: "정답입니다! '책상'은 교실이나 방에 있는 가구의 이름이에요. 이름을 나타내는 낱말들은 모양이 변하지 않고 늘 그 자리에 있다는 걸 잘 이해했네요!", fbNo: "책상이 콩콩 뛰어다니거나 표정이 변하나요? 우리가 매일 앉아서 공부하는 그 물건을 부르는 '이름'이라는 점을 떠올려 보세요.", hint: "🪑 모양이 변하지 않고, 딱 정해진 물건을 부르는 말이에요." },
+    { word: "웃다", a: 2, fbOk: "완벽해요! '웃다'는 입꼬리를 올리고 소리를 내는 움직임이에요. 이 낱말이 나중에 '웃고', '웃으니'처럼 어떻게 변신할지 기대해 봐도 좋아요!", fbNo: "재미있는 이야기를 들었을 때 내 얼굴과 입술이 어떻게 '움직이는지' 떠올려 보세요. 물건의 이름은 아니랍니다.", hint: "😄 내 몸의 일부분이 직접 '움직이는' 행동이에요." },
+    { word: "무겁다", a: 3, fbOk: "맞아요! '무겁다'는 물건을 들었을 때 느껴지는 상태를 나타내요. 상태를 나타내는 이 낱말도 앞으로 다양하게 변신할 거라는 사실, 꼭 기억해 두세요!", fbNo: "쇳덩어리가 스스로 움직이는 걸까요? 무거운 것을 번쩍 들었을 때 끙끙거리게 되는 그 '상태'나 '느낌'에 집중해 보세요.", hint: "🏋️ 들어 올렸을 때 느껴지는 '성질'이나 '상태'를 말해요." },
+    { word: "친구", a: 1, fbOk: "참 잘했어요! '친구'는 나와 가깝게 지내는 사람을 부르는 이름이죠. 대상의 이름을 정확히 아는 것은 모든 학습의 든든한 기초가 됩니다.", fbNo: "쉬는 시간에 나와 교실에서 함께 노는 그 사람을 무엇이라고 '부르는지' 생각해 보세요. 동작을 뜻하는 말은 아니에요.", hint: "👫 어떤 대상을 콕 집어서 부르는 '이름'이에요." },
+    { word: "먹다", a: 2, fbOk: "대단해요! '먹다'는 입으로 음식을 씹고 삼키는 뚜렷한 움직임을 나타냅니다. 나중에 낱말이 변신할 때 지금 찾은 이 기본형 모습이 꼭 필요하답니다.", fbNo: "맛있는 급식을 입에 쏙 넣고 오물오물 씹는 나의 '행동'을 머릿속으로 생생하게 그려보세요. 가만히 있는 물건이 아니에요.", hint: "🍱 내 몸이 직접 무언가를 하는 '동작'이에요." },
+    { word: "춥다", a: 3, fbOk: "딩동댕! '춥다'는 겨울에 느껴지는 날씨의 상태를 나타내는 낱말이에요. 상태를 나타내는 낱말을 잘 찾았으니, 다음 단계인 낱말 변신도 아주 쉽게 해낼 거예요!", fbNo: "눈 내리는 한겨울에 밖에 나갔을 때 내 몸이 느끼는 '상태'가 어떤지 떠올려 보세요. 동작이나 물건의 이름은 아니에요.", hint: "🥶 날씨나 내 몸이 느끼는 '상태'를 설명하는 말이에요." },
+    { word: "강아지", a: 1, fbOk: "맞습니다! '강아지'는 꼬리를 흔드는 귀여운 동물을 부르는 이름이죠. 변신하지 않는 이름과 변신하는 낱말을 구분하는 능력이 점점 좋아지고 있어요!", fbNo: "강아지가 '달리는' 것은 움직임이지만, '강아지'라는 낱말 자체는 대상을 콕 집어 부르는 '이름'이라는 점을 생각해 보세요.", hint: "🐶 눈에 보이는 동물을 부르는 말이에요." },
+    { word: "자다", a: 2, fbOk: "정확해요! '자다'는 눈을 감고 편안하게 쉬는 움직임(행동)을 나타냅니다. '자고', '자니' 등으로 형태가 변할 수 있는 중요한 낱말이라는 점을 잘 파악했어요.", fbNo: "피곤할 때 내 몸이 침대에서 쿨쿨 무엇을 하는지 그 '동작'을 떠올려 보세요. 이불이나 베개 같은 이름이 아니에요.", hint: "🛏️ 내가 직접 취하는 '행동'이나 '동작'을 뜻해요." },
+    { word: "빠르다", a: 3, fbOk: "훌륭해요! '빠르다'는 속도가 쌩쌩 나는 상태나 성질을 말해요. 움직임은 아니지만 나중에 여러 모양으로 변신할 수 있는 낱말이라는 점을 잘 기억해 주세요.", fbNo: "달리다'는 움직임이지만, '빠르다'는 그 달리는 속도가 어떤지 나타내는 '상태'예요. 자동차의 속도가 어떠한지 묘사하는 말이랍니다.", hint: "⚡ 속도나 모습이 어떠한지 그 '상태'를 설명하는 말이에요." },
+    { word: "학교", a: 1, fbOk: "정답! '학교'는 우리가 공부하러 가는 장소의 이름이에요. 이렇게 낱말의 종류를 명확히 구분해 두면, 나중에 길고 복잡한 문장도 쉽게 이해할 수 있답니다.", fbNo: "학교' 건물 전체가 스스로 움직일 수 있을까요? 우리가 매일 아침 가방을 메고 도착하는 그 장소를 부르는 '이름'을 생각해 보세요.", hint: "🏫 어떤 장소나 장소를 콕 집어 부르는 '이름'이에요." },
+    { word: "쓰다(글을 쓰다)", a: 2, fbOk: "완벽합니다! '쓰다'는 연필을 쥐고 글씨를 적는 움직임이에요. 이 낱말이 나중에 어떻게 변신하든, 지금 찾은 이 '기본형'이 진짜 모습이라는 걸 잊지 마세요!", fbNo: "연필을 들고 내가 직접 손을 움직이는 '행동'이에요. 글씨를 적을 때 손이 어떻게 움직이는지 상상해 보세요.", hint: "✍️ 내 손이나 몸을 이용해 직접 하는 '행동'을 말해요." },
+    { word: "깨끗하다", a: 3, fbOk: "맞아요! 방금 청소를 끝낸 교실의 모습을 떠올려 보세요. '깨끗하다'는 어떤 곳이나 물건의 상태가 먼지 없이 말끔한 상태를 나타내는 낱말이에요.", fbNo: "청소하다'는 몸을 움직이는 거지만, '깨끗하다'는 청소가 끝난 뒤의 방 '상태'를 말해요. 어떤 행동을 하는 것이 아니랍니다.", hint: "✨ 먼지나 쓰레기가 없는 '상태'를 묘사해요." },
+    { word: "우산", a: 1, fbOk: "정답! 비가 올 때 우리가 쓰는 물건을 부르는 이름이죠. '우산'처럼 변신하지 않는 이름 낱말들은 문장에서 변함없는 든든한 기둥 역할을 해준답니다.", fbNo: "우산이 스스로 접혔다 펴지나요? 아니에요. 비를 막아주는 그 고마운 도구를 우리가 무엇이라고 부르는지 생각해 보세요.", hint: "☂️ 비 올 때 쓰는 물건을 부르는 '이름'이에요." },
+    { word: "만들다", a: 2, fbOk: "참 잘했어요! '만들다'는 찰흙이나 종이로 무언가를 뚝딱뚝딱 완성해 내는 몸의 움직임이에요. '만들고', '만들지'처럼 변신할 때 뼈대가 되는 기본형이랍니다.", fbNo: "블록이나 색종이 같은 물건의 이름이 아니에요. 손을 바쁘게 움직여서 무언가를 완성해 나가는 나의 '행동'을 그려보세요.", hint: "🛠️ 손을 써서 새로운 것을 만들어내는 '동작'이에요." },
+    { word: "뜨겁다", a: 3, fbOk: "훌륭해요! 펄펄 끓는 국을 먹었을 때의 느낌을 나타내는 상태의 낱말이에요. 상태를 나타내는 말도 움직임을 나타내는 말처럼 자유롭게 변신할 수 있답니다.", fbNo: "끓는 물이 스스로 춤을 추는 동작일까요? 물에 손을 댔을 때 내 피부가 깜짝 놀라며 느끼는 그 '상태'에 집중해 보세요.", hint: "♨️ 불이나 물에 데었을 때 느껴지는 '상태'를 말해요." },
+    { word: "선생님", a: 1, fbOk: "정답입니다! 우리에게 공부를 가르쳐 주시는 분을 부르는 이름이죠. 사람의 직업이나 역할을 부르는 말도 모두 모양이 변하지 않는 '이름'이라는 사실!", fbNo: "가르치다'는 움직임이지만, 그 행동을 하시는 분을 무엇이라고 부를까요? 우리 반에서 나를 도와주시는 어른의 '이름'을 생각해 보세요.", hint: "👩‍🏫 특정한 역할을 하는 사람을 부르는 '이름'이에요." },
+    { word: "보다", a: 2, fbOk: "완벽해요! '보다'는 눈을 떠서 무언가를 바라보는 행동이에요. 눈의 움직임을 나타내는 이 작은 낱말이 문장을 아주 활기차게 만들어 준답니다.", fbNo: "가만히 있는 물건의 이름일까요? 텔레비전이나 예쁜 그림을 향해 내 눈동자가 향하는 '동작'을 머릿속에 떠올려 보세요.", hint: "👀 눈을 통해서 무언가를 관찰하는 '행동'이에요." },
+    { word: "사과", a: 1, fbOk: "맞아요! '사과'는 아삭아삭하고 빨간 과일을 부르는 이름이에요. 과일의 이름도 모양이 절대 변하지 않는다는 점을 잘 알았네요!", fbNo: "사과가 스스로 나무에서 뛰어내리지는 않아요. 우리가 맛있게 한 입 베어 무는 그 둥근 과일의 '이름'이 무엇인지 떠올려 보세요.", hint: "🍎 맛있고 빨간 과일을 부르는 '이름'이에요." },
+    { word: "걷다", a: 2, fbOk: "대단해요! '걷다'는 두 발을 번갈아 움직여서 앞으로 나아가는 명확한 움직임이에요. '걷고', '걸으니'로 변신할 준비가 된 낱말이랍니다.", fbNo: "가만히 있는 길이 아니라, 그 길 위에서 내 두 다리가 어떻게 '움직이는지' 떠올려 보세요. 발을 움직이는 행동이랍니다.", hint: "🚶‍♂️ 두 발을 사용해서 앞으로 나아가는 '동작'이에요." },
+    { word: "크다", a: 3, fbOk: "딩동댕! 코끼리나 높은 빌딩을 보았을 때 크기가 어떤지 나타내는 상태를 말해요. 크기를 설명하는 말들도 성질과 상태에 들어간답니다.", fbNo: "건물이 스스로 커지는 동작일까요? 처음부터 엄청난 크기를 자랑하는 공룡이나 산의 '상태'를 설명하는 말이라는 점을 기억하세요.", hint: "🐘 크기나 부피가 어떠한지 묘사하는 '상태'예요." },
+    { word: "가방", a: 1, fbOk: "정답! 학교 갈 때 책을 넣고 다니는 물건의 이름이죠. 매일매일 보는 사물의 이름을 정확히 분류하는 숙달 목표를 잘 향해 가고 있어요.", fbNo: "책을 담는 그 주머니가 직접 걸어 다니나요? 내 등 뒤에 꼭 매달려 있는 그 물건을 부르는 '이름'을 생각해 보세요.", hint: "🎒 물건을 담아 메고 다니는 주머니의 '이름'이에요." },
+    { word: "읽다", a: 2, fbOk: "훌륭합니다! 책을 펴고 글자를 소리 내거나 눈으로 따라가는 움직임이에요. 책이라는 '이름'을 가지고 하는 '행동'이라는 점을 잘 구분했어요!", fbNo: "책이나 글자는 그냥 이름이에요. 그 책을 펴놓고 내 눈동자와 입술이 바쁘게 '움직이는' 모습을 상상해 보세요.", hint: "📖 책에 적힌 글자를 눈으로 보거나 소리 내는 '행동'이에요." },
+    { word: "작다", a: 3, fbOk: "참 잘했어요! 개미나 콩알을 보았을 때 그 크기가 어떤지를 나타내는 상태의 낱말이에요. '작고', '작으니'처럼 변신도 자유롭답니다.", fbNo: "개미가 작아지는 춤을 추는 걸까요? 아주 조그마한 물건을 보았을 때 그 크기가 어떠한지 묘사하는 '상태'를 나타내는 말이에요.", hint: "🐜 크기가 눈에 띄게 조그마한 '상태'를 말해요." },
+    { word: "자전거", a: 1, fbOk: "맞습니다! 페달을 밟아서 타는 놀이기구이자 탈것의 이름이죠. 이렇게 물건의 이름을 나타내는 낱말들은 형태가 고정되어 변하지 않아요.", fbNo: "자전거가 '달리는' 것은 움직임이지만, 바퀴가 두 개 달린 그 물건 자체를 부르는 말이 무엇인지 생각해 보세요.", hint: "🚲 두 바퀴로 굴러가는 탈것을 부르는 '이름'이에요." },
+    { word: "입다", a: 2, fbOk: "완벽해요! 옷을 내 몸에 걸치고 단추를 채우는 움직임이에요. 겉옷, 바지, 치마 등 수많은 '이름' 낱말들과 짝꿍이 되는 중요한 '움직임' 낱말이랍니다.", fbNo: "바지나 티셔츠는 이름이에요. 그 옷에 팔과 다리를 쏙 집어넣어 내 몸에 맞추는 '행동'이 무엇인지 떠올려 보세요.", hint: "👕 옷을 몸에 걸치기 위해 몸을 움직이는 '동작'이에요." },
+    { word: "길다", a: 3, fbOk: "정답입니다! 기린의 목이나 줄넘기의 끈이 어떤 모양인지 나타내는 상태예요. 길이가 어떠한지 나타내는 낱말도 상태에 속한다는 걸 잘 알았네요!", fbNo: "기차가 스스로 늘어나는 마술을 부리는 걸까요? 끝에서 끝까지 거리가 쭈욱 늘어나 있는 그 모양이나 '상태'를 떠올려 보세요.", hint: "📏 끄트머리에서 끄트머리까지의 거리가 어떤지 나타내는 '상태'예요." },
+    { word: "피아노", a: 1, fbOk: "맞아요! 건반을 눌러 아름다운 소리를 내는 악기의 이름이에요. 악기, 물건, 장소 모두 모양이 변하지 않는 '이름'의 방에 쏙 들어간답니다.", fbNo: "피아노를 치다'에서 치는 것은 움직임이지만, 까맣고 하얀 건반이 있는 그 악기를 부르는 말은 무엇일까요?", hint: "🎹 소리를 내는 커다란 건반 악기를 부르는 '이름'이에요." },
+    { word: "씻다", a: 2, fbOk: "대단해요! 비누칠을 하고 물로 헹구는 손과 몸의 부지런한 움직임이에요. 나중에 '씻고', '씻어서'로 변신할 때 뼈대가 되는 중요한 기본형입니다!", fbNo: "비누나 물은 이름이지만, 손을 비비고 물로 헹궈내는 그 바쁜 '행동'을 무엇이라고 하는지 상상해 보세요.", hint: "🧼 물로 깨끗하게 문지르는 나의 '동작'이에요." },
+    { word: "짧다", a: 3, fbOk: "딩동댕! 몽당연필처럼 길이가 댕강 줄어든 모습을 나타내는 상태예요. '길다'와 반대되는 상태를 나타내는 낱말도 아주 잘 찾았어요.", fbNo: "연필이 스스로 줄어드는 마술일까요? 다 써서 꼬마가 되어버린 몽당연필의 모습이나 '상태'를 설명하는 말이에요.", hint: "✏️ 끝에서 끝까지 거리가 얼마 안 되는 '상태'를 말해요." },
+    { word: "나무", a: 1, fbOk: "정답! 뿌리를 내리고 잎을 피우는 식물을 부르는 이름이에요. 산이나 공원에서 자주 보는 자연물의 이름도 변하지 않는 낱말에 속한답니다.", fbNo: "식물이 자라는 것은 움직임이지만, 기둥과 나뭇가지, 잎사귀로 이루어진 그 대상을 우리가 콕 집어서 뭐라고 '부르는지' 떠올려 보세요.", hint: "🌳 뿌리, 기둥, 잎이 있는 식물을 부르는 '이름'이에요." },
+    { word: "놀다", a: 2, fbOk: "훌륭합니다! 술래잡기나 미끄럼틀을 타며 즐겁게 몸을 움직이는 행동이에요. '놀고', '놀면'으로 어떻게 변신할지 상상하며 다음 단계로 넘어가 봐요!", fbNo: "장난감은 이름이지만, 장난감을 가지고 즐겁게 뛰고 구르며 시간을 보내는 나의 '행동'이 무엇인지 생각해 보세요.", hint: "🎠 즐겁게 시간을 보내며 몸을 움직이는 '동작'이에요." },
+    { word: "덥다", a: 3, fbOk: "참 잘했어요! 한여름 뙤약볕 아래에서 땀이 뻘뻘 날 때 느껴지는 날씨의 상태예요. '춥다'와 마찬가지로 날씨를 나타내는 말은 상태에 속합니다.", fbNo: "여름이라는 계절의 이름이 아니에요. 햇빛이 쨍쨍 내리쬘 때 내 몸이 달아오르며 느끼는 그 찜찜하고 뜨거운 '상태'를 떠올려 보세요.", hint: "🥵 여름철 날씨나 몸이 열기를 느끼는 '상태'예요." },
+    { word: "구름", a: 1, fbOk: "맞습니다! 하늘에 둥둥 떠 있는 하얀 솜사탕 같은 자연물을 부르는 이름이죠. 하늘 위에도 이렇게 변하지 않는 이름들이 많이 있답니다.", fbNo: "구름이 흘러가는 것은 움직임이지만, 하늘에 떠 있는 그 하얀 덩어리들을 부르는 '이름'이 무엇인지 생각해 보세요.", hint: "☁️ 하늘에 떠 있는 하얀 수증기 덩어리를 부르는 '이름'이에요." },
+    { word: "타다", a: 2, fbOk: "완벽해요! 자전거나 버스에 내 몸을 싣는 움직임이에요. '자전거'라는 이름과 '타다'라는 움직임이 만나면 멋진 문장이 하나 완성된답니다!", fbNo: "미끄럼틀이나 그네는 탈것의 이름이에요. 거기에 엉덩이를 대고 앉아 앞으로 슝 나아가는 나의 '행동'을 상상해 보세요.", hint: "🚌 놀이기구나 자동차에 몸을 싣는 '동작'이에요." },
+    { word: "차갑다", a: 3, fbOk: "정답입니다! 냉장고에서 갓 꺼낸 아이스크림을 만졌을 때의 느낌을 나타내는 상태예요. 온도가 어떤지 나타내는 낱말의 원리를 완벽히 숙달했네요!", fbNo: "얼음이 스스로 꽁꽁 어는 행동일까요? 얼음을 손으로 쥐었을 때 손바닥이 시리게 느끼는 그 서늘한 '상태'에 집중해 보세요.", hint: "🧊 얼음이나 눈을 만졌을 때의 '상태'를 말해요." },
+    { word: "시계", a: 1, fbOk: "맞아요! 똑딱똑딱 우리에게 시간을 알려주는 물건의 이름이에요. 우리 주변에 있는 수많은 물건들의 이름을 정확히 아는 것이 가장 중요해요.", fbNo: "바늘이 움직이긴 하지만, 숫자가 적혀 있고 벽에 걸려 있는 그 둥근 물건 자체를 뭐라고 부르는지 떠올려 보세요.", hint: "⏰ 지금 몇 시인지 알려주는 물건을 부르는 '이름'이에요." },
+    { word: "날다", a: 2, fbOk: "대단해요! 새나 비행기가 날개를 파닥이거나 엔진을 켜고 공중을 슝슝 나아가는 멋진 움직임이에요. '날고', '나니'로 어떻게 변신할지 기대해 보세요!", fbNo: "하늘을 둥둥 떠다니는 비행기라는 물건 이름이 아니에요. 새가 날개를 파닥거리며 공중에 떠오르는 그 '행동'을 그려보세요.", hint: "🕊️ 공중에 떠서 앞으로 나아가는 '동작'이에요." },
+    { word: "높다", a: 3, fbOk: "딩동댕! 산꼭대기나 하늘까지 닿을 듯한 층수의 건물을 보았을 때 나타내는 상태예요. 길이나 크기뿐만 아니라 높낮이를 나타내는 말도 상태에 속한답니다.", fbNo: "산이 스스로 위로 솟아오르는 중일까요? 처음부터 구름에 닿을 듯이 서 있는 빌딩이나 산의 위치가 어떠한지 나타내는 '상태'를 말해요.", hint: "🏔️ 산이나 건물이 위쪽으로 많이 솟아 있는 '상태'예요." },
+    { word: "신발", a: 1, fbOk: "정답! 밖을 걸어 다닐 때 발이 아프지 않게 발에 쏙 신는 물건의 이름이죠. 매일 사용하는 사물들의 이름표를 정확히 붙여주었네요!", fbNo: "발을 꼼지락거리는 움직임일까요? 내 두 발을 감싸주는 고마운 짝꿍 물건을 무엇이라고 '부르는지' 생각해 보세요.", hint: "👟 외출할 때 발에 신는 물건을 부르는 '이름'이에요." },
+    { word: "뛰다", a: 2, fbOk: "훌륭합니다! 줄넘기를 하거나 체육 시간에 콩콩 위로 솟구치는 움직임이에요. '달리다'와 비슷하면서도 위아래로 움직이는 생동감 넘치는 동작이죠!", fbNo: "뜀틀이나 줄넘기라는 물건의 이름이 아니에요. 줄이 넘어올 때 내 두 발이 바닥에서 떨어져 위로 붕 떠오르는 '행동'을 상상해 보세요.", hint: "🦘 두 발을 구르며 위나 앞으로 몸을 솟구치는 '동작'이에요." },
+    { word: "달다", a: 3, fbOk: "참 잘했어요! 사탕이나 꿀을 입에 넣었을 때 혀끝에서 퍼지는 맛의 상태예요. 날씨, 크기뿐만 아니라 '맛'을 나타내는 낱말도 상태에 포함된다는 걸 잘 배웠네요!", fbNo: "설탕이 스스로 단맛을 뿜어내는 마술일까요? 맛있는 초콜릿이 혀에 닿았을 때 느껴지는 그 기분 좋은 '상태'를 나타내는 말이에요.", hint: "🍭 사탕이나 초콜릿을 먹었을 때 혀가 느끼는 맛의 '상태'예요." },
+    { word: "병원", a: 1, fbOk: "맞습니다! 몸이 아플 때 의사 선생님을 만나러 가는 장소의 이름이에요. '학교'처럼 건물이 있는 특정 장소도 모두 변하지 않는 이름의 방에 들어갑니다.", fbNo: "주사를 놓거나 약을 먹는 것은 움직임이지만, 아픈 사람들을 치료해 주는 그 십자가가 그려진 건물을 무엇이라고 부르는지 떠올려 보세요.", hint: "🏥 몸이 아플 때 진찰을 받으러 가는 곳의 '이름'이에요." },
+    { word: "열다", a: 2, fbOk: "완벽해요! 손잡이를 잡고 문을 당기거나 상자 뚜껑을 벗기는 손의 움직임이에요. 문을 열 때 내 팔 근육이 어떻게 움직이는지 생각하면 쉽게 알 수 있어요.", fbNo: "창문이나 책상 서랍은 그냥 물건 이름이에요. 꼭 닫혀 있는 서랍 손잡이를 잡고 앞으로 스르륵 당기는 나의 '행동'을 그려보세요.", hint: "🚪 문이나 뚜껑을 치워서 안이 보이게 하는 '동작'이에요." },
+    { word: "귀엽다", a: 3, fbOk: "정답입니다! 아기 고양이나 토끼를 보았을 때 느껴지는 모습이나 느낌을 말해요. '예쁘다'처럼 대상을 보고 느껴지는 상태를 표현하는 낱말이랍니다.", fbNo: "아기 강아지가 꼬리를 흔드는 행동일까요? 작고 소중한 동물을 보았을 때 내 마음속에서 몽글몽글 피어나는 그 느낌이나 '상태'를 떠올려 보세요.", hint: "🐰 사랑스럽고 앙증맞은 동물을 보았을 때의 '상태'나 느낌이에요." },
+    { word: "바다", a: 1, fbOk: "맞아요! 여름 방학에 물놀이를 하러 가는 넓고 파란 물이 있는 곳의 이름이에요. '나무', '구름'처럼 우리가 자연에서 볼 수 있는 장소의 이름이랍니다.", fbNo: "파도가 철썩철썩 치는 것은 움직임이지만, 그 넓은 소금물이 모여 있는 거대한 장소를 우리가 뭐라고 '부르는지' 생각해 보세요.", hint: "🌊 아주 넓고 짜가운 물이 모여 있는 곳을 부르는 '이름'이에요." },
+    { word: "듣다", a: 2, fbOk: "대단해요! 귀를 쫑긋 세우고 노래나 친구의 이야기를 귀담아받아들이는 움직임이에요. 눈으로 '보는' 것처럼 귀로 하는 아주 중요한 '행동'이랍니다.", fbNo: "음악이나 노랫소리라는 이름이 아니에요. 스피커에서 흘러나오는 소리에 내 귀를 기울이고 집중하는 '행동'을 상상해 보세요.", hint: "👂 소리를 귀로 알아차리고 집중하는 '동작'이에요." },
+    { word: "맵다", a: 3, fbOk: "딩동댕! 떡볶이나 김치를 먹었을 때 입안이 얼얼해지는 맛의 상태예요. 맛, 느낌, 날씨, 크기 등 상태를 나타내는 낱말들을 이제 완벽히 숙달했어요!", fbNo: "고춧가루가 입안에서 불을 뿜는 행동일까요? 매운 음식을 먹고 입술이 따갑고 화끈거리며 물을 찾게 되는 그 '상태'를 말해요.", hint: "🌶️ 입안이 화끈거리고 얼얼할 때 느끼는 맛의 '상태'예요." }
+  ];
+
+  // 2단계: 낱말의 공통 기본형 찾기
+  let STAGE2A = [
+    { forms: "봐요 / 보면 / 보고 / 보았어요", base: "보다", fbOk: "명탐정 등장! 꼬리들이 변해도 진짜 몸통인 '보-'에 '-다'를 붙인 기본형을 완벽히 찾아냈어요. 사전에서 이 낱말을 찾을 때 꼭 필요한 모습이랍니다.", fbNo: "변신한 꼬리(-요, -면, -고)를 살짝 떼어내 볼까요? 변하지 않는 몸통 '보-'에 원래 꼬리인 '-다'를 붙여보세요!", hint: "🕵️‍♂️ 사전에서 검색할 때는 '-다'로 끝나는 모습을 써야 해요." },
+    { forms: "읽어요 / 읽으면 / 읽고 / 읽었어요", base: "읽다", fbOk: "훌륭해요! 여러 가지 모습으로 변해도 진짜 이름표는 '읽다'라는 걸 알아냈군요. 1단계에서 배운 '움직임' 낱말의 원래 모습입니다!", fbNo: "'읽어요', '읽고'에서 계속 반복되는 앞부분 글자가 무엇인지 찾아보세요. 거기에 '-다'를 붙이면 진짜 모습이 나와요.", hint: "📖 계속 똑같이 남아있는 앞글자를 찾아 '-다'를 붙여요!" },
+    { forms: "먹어요 / 먹으면 / 먹고 / 먹었어요", base: "먹다", fbOk: "대단해요! 맛있는 음식을 삼키는 '움직임' 낱말의 기본형을 잘 찾았어요. 기본형을 알면 아무리 낱말이 길어지도 뜻을 쉽게 알 수 있어요.", fbNo: "'먹-' 뒤에 붙은 옷들이 자꾸 바뀌고 있어요. 변장한 옷들을 모두 벗기고 가장 기본이 되는 꼬리 '-다'를 입혀주세요.", hint: "🍱 뒤에 붙은 '-어요', '-고'를 떼고 '-다'를 붙이세요." },
+    { forms: "씻어요 / 씻으면 / 씻고 / 씻었어요", base: "씻다", fbOk: "정답입니다! 변하지 않는 뼈대인 '씻-'을 아주 잘 찾아냈어요. 이렇게 기본형을 찾는 연습이 국어 실력을 쑥쑥 키워줍니다.", fbNo: "'씻어요', '씻고'에서 절대 변하지 않는 글자가 하나 있죠? 그 글자 뒤에 기본 꼬리 '-다'를 붙이면 정답이 보입니다.", hint: "🧼 낱말의 앞부분을 잘 살펴보고, 뒤에 '-다'를 붙여보세요." },
+    { forms: "걸어요 / 걸으면 / 걷고 / 걸었어요", base: "걷다", fbOk: "와, 진짜 탐정이네요! '걸-'과 '걷-'으로 모양이 살짝 바뀌는 어려운 낱말인데도 원래 몸통이 '걷다'라는 걸 멋지게 추리해 냈어요!", fbNo: "이 낱말은 마법사처럼 '걷-'이 '걸-'로 살짝 변신하기도 해요. 하지만 사전에서 찾을 때의 원래 모습은 'ㄷ' 받침을 쓴답니다.", hint: "🚶‍♂️ 모양이 살짝 변하는 마법 낱말! 원래 받침은 'ㄷ'이에요." },
+    { forms: "만들어요 / 만들면 / 만들고 / 만들었어요", base: "만들다", fbOk: "참 잘했어요! 무언가를 완성하는 '움직임' 낱말의 진짜 모습이네요. '만들다'라는 기본형 하나에서 정말 많은 말이 나올 수 있어요.", fbNo: "'만들-' 뒤에 붙은 '-어요', '-면' 같은 꼬리들을 가려보세요. 남은 글자에 '-다'를 붙이면 낱말의 원래 모습이 완성됩니다.", hint: "🛠️ 뒤에 붙은 여러 가지 꼬리를 떼고 '-다'를 붙여요." },
+    { forms: "자요 / 자면 / 자고 / 잤어요", base: "자다", fbOk: "완벽해요! 1단계에서 찾은 움직임 낱말 '자다'가 이렇게 여러 옷을 갈아입는다는 걸 직접 확인했네요!", fbNo: "자요'에서 '-요'를 떼고 기본 꼬리를 붙여볼까요? 낱말 탐정의 기본 규칙은 마지막에 항상 '-다'로 끝난다는 것이에요!", hint: "🛏️ 꼬리를 싹둑 자르고 '-다'를 붙이는 탐정 규칙!" },
+    { forms: "웃어요 / 웃으면 / 웃고 / 웃었어요", base: "웃다", fbOk: "훌륭합니다! 빙그레 미소 짓는 이 움직임 낱말의 기본형을 잘 찾았어요. 국어사전을 찾을 때 이제 헤매지 않을 거예요!", fbNo: "여러 단어에서 계속 변하지 않고 남아있는 '웃-'이라는 글자에 집중해 보세요. 그 뒤에 기본 꼬리만 붙이면 끝!", hint: "😄 변하지 않는 앞글자를 찾아 '-다'를 붙여보세요." },
+    { forms: "달려요 / 달리면 / 달리고 / 달렸어요", base: "달리다", fbOk: "정답! '달리-'라는 긴 몸통을 훌륭하게 찾아냈어요! 이렇게 뼈대를 잘 찾으면 낱말이 어떻게 변신하는지 한눈에 보인답니다.", fbNo: "'달리-' 뒤에 여러 꼬리가 붙어서 '달려요(달리어요)'처럼 합체하기도 해요. 하지만 진짜 뼈대는 세 글자라는 걸 기억하세요!", hint: "🏃‍♂️ 변하지 않는 뼈대를 찾고 뒤에 '-다'를 붙이세요." },
+    { forms: "뛰어요 / 뛰면 / 뛰고 / 뛰었어요", base: "뛰다", fbOk: "대단해요! 콩콩 위로 솟아오르는 이 낱말의 기본형을 정확히 찾았네요. 기본형을 알면 글을 읽을 때 뜻이 훨씬 분명해져요.", fbNo: "뛰-'라는 글자가 계속 보이죠? 꼬리를 여러 가지로 변신시켜도 원래 몸통에 '-다'를 붙이는 규칙은 변하지 않아요.", hint: "🦘 똑같이 반복되는 글자에 '-다'를 연결해 보세요." },
+    { forms: "써요 / 쓰면 / 쓰고 / 썼어요", base: "쓰다", fbOk: "맞아요! 연필로 글씨를 남기는 이 낱말의 원래 모습이네요. 모양이 '써요(쓰+어요)'로 합체해도 진짜 몸통인 '쓰-'를 잘 찾아냈습니다.", fbNo: "'써요'는 '쓰-'와 '-어요'가 빠르게 합체한 모습이에요. '쓰면', '쓰고'를 보며 숨겨진 진짜 몸통을 추리해 보세요!", hint: "✍️ 합체하기 전의 원래 글자를 생각하고 '-다'를 붙여요." },
+    { forms: "잡아요 / 잡으면 / 잡고 / 잡았어요", base: "잡다", fbOk: "딩동댕! 무언가를 손에 쥐는 움직임의 기본형을 찾았어요. 탐정처럼 변하지 않는 앞글자를 쏙 뽑아내는 실력이 최고예요!", fbNo: "잡-'이라는 글자는 계속 똑같이 나타나죠? 뒤에 있는 변장한 꼬리들을 모두 치우고 기본 꼬리 '-다'를 달아주세요.", hint: "✊ 앞글자를 그대로 두고 뒤에 '-다'를 붙이세요." },
+    { forms: "열어요 / 열면 / 열고 / 열었어요", base: "열다", fbOk: "정답입니다! 문을 활짝 여는 이 움직임 낱말의 기본형을 아주 쉽게 찾아냈네요. 사전을 찾을 때 '열고'가 아닌 '열다'를 찾는다는 것 잊지 마세요!", fbNo: "뒤에 붙은 '-어요', '-고' 같은 꼬리표를 떼어내 보세요. 남은 '열-'에 기본 꼬리를 붙이면 진짜 이름이 나옵니다.", hint: "🚪 변장한 꼬리를 떼고 '-다'를 붙여보세요." },
+    { forms: "닫아요 / 닫으면 / 닫고 / 닫았어요", base: "닫다", fbOk: "참 잘했어요! '열다'와 반대되는 낱말의 기본형도 가뿐하게 찾아냈군요. 이렇게 기본형끼리 묶어서 기억하면 어휘력이 쑥쑥 늘어요.", fbNo: "'닫-' 글자가 계속 반복되고 있어요! 반복되는 글자에 탐정의 마법 꼬리인 '-다'를 붙이면 원래 모습으로 돌아갑니다.", hint: "🔒 계속 반복되는 글자 뒤에 '-다'를 연결하세요." },
+    { forms: "찾아요 / 찾으면 / 찾고 / 찾았어요", base: "찾다", fbOk: "완벽해요! 숨겨진 물건을 발견하는 움직임의 진짜 모습을 찾아냈네요. 기본형을 찾는 우리 탐정님과 너무 잘 어울리는 낱말이에요!", fbNo: "뒤에 있는 꼬리들이 계속 변하고 있지만, 꿋꿋하게 자리를 지키는 앞글자가 있어요. 그 글자에 '-다'를 붙여보세요.", hint: "🔎 변하지 않는 뼈대를 찾고 뒤에 '-다'를 달아주세요." },
+    { forms: "만나요 / 만나면 / 만나고 / 만났어요", base: "만나다", fbOk: "훌륭합니다! 친구와 인사하는 이 낱말의 긴 몸통 '만나-'를 잘 찾았어요. 세 글자짜리 기본형도 문제없이 척척 찾아내는군요!", fbNo: "'만나요(만나+아요)'처럼 합체한 글자에 속지 마세요! '만나고'나 '만나면'을 보면 원래 몸통이 '만나-'라는 걸 알 수 있어요.", hint: "🤝 합체한 글자를 분리해 원래 뼈대 뒤에 '-다'를 붙여요." },
+    { forms: "기다려요 / 기다리면 / 기다리고 / 기다렸어요", base: "기다리다", fbOk: "대단해요! 몸통이 아주 긴 낱말인데도 기본형을 완벽히 찾아냈어요. 이렇게 긴 낱말의 뼈대를 찾을 수 있다면 못 찾을 낱말이 없답니다!", fbNo: "'기다려요'는 '기다리-'와 '-어요'가 합체한 거예요. '기다리고'를 보면 진짜 몸통이 '기다리-'라는 걸 추리할 수 있어요.", hint: "⏳ 긴 낱말도 두려워 마세요! 변하지 않는 부분에 '-다'를 붙여요." },
+    { forms: "가요 / 가면 / 가고 / 갔어요", base: "가다", fbOk: "정답! 아주 짧고 간단한 낱말의 뼈대를 잘 찾아냈어요. 꼬리가 아무리 짧아져도 진짜 모습은 '-다'로 끝난다는 사실을 잊지 마세요.", fbNo: "'가요(가+아요)'처럼 앞뒤가 똑같아서 하나로 줄어든 글자에 속지 마세요. '가면'을 보면 원래 몸통이 '가-'라는 걸 알 수 있어요.", hint: "🚶‍♀️ 가장 기본이 되는 글자 뒤에 '-다'를 붙여보세요." },
+    { forms: "와요 / 오면 / 오고 / 왔어요", base: "오다", fbOk: "맞아요! 1단계 움직임 낱말에서 본 기본형이네요. '와요'처럼 완전히 모양이 합체되어도 원래 모습 '오-'를 추리해 낸 실력이 대단해요!", fbNo: "'와요'는 '오-'와 '-아요'가 합체한 모습이에요. '오고', '오면'을 살펴보면 원래 뼈대가 무엇인지 힌트를 얻을 수 있어요.", hint: "🙋‍♂️ '오고'나 '오면'에서 힌트를 얻어 '-다'를 붙여요!" },
+    { forms: "해요 / 하면 / 하고 / 했어요", base: "하다", fbOk: "참 잘했어요! 우리가 정말 자주 쓰는 이 움직임 낱말의 뼈대도 잘 찾았습니다. '하다'는 여러 낱말과 합체해서 수많은 움직임을 만들어낸답니다!", fbNo: "'해요'는 '하-'와 '-여요'가 합체해서 모양이 변한 거예요. '하면', '하고'를 보면 원래 몸통이 '하-'라는 걸 알 수 있어요.", hint: "✨ 아주 자주 쓰는 기본형이에요! 뼈대에 '-다'를 붙여요." },
+    { forms: "놀아요 / 놀면 / 놀고 / 놀았어요", base: "놀다", fbOk: "완벽해요! 신나게 뛰노는 움직임의 기본형을 잘 찾았어요. 이제 사전에서 '놀고' 대신 '놀다'를 찾아야 한다는 걸 확실히 알게 되었네요.", fbNo: "'놀-' 뒤에 여러 가지 옷을 입혀놓은 모습이에요. 변장한 옷들을 모두 벗기고 원래 꼬리인 '-다'를 입혀주세요.", hint: "🎠 꼬리를 떼고 '-다'를 붙이는 탐정 규칙을 적용해요!" },
+    { forms: "타요 / 타면 / 타고 / 탔어요", base: "타다", fbOk: "정답입니다! 미끄럼틀이나 자전거를 이용하는 움직임의 진짜 이름표네요. 짧은 낱말의 변신 규칙도 완벽하게 이해했어요.", fbNo: "'타요(타+아요)'처럼 꼬리가 몸통에 찰싹 달라붙어 있어요. '타고'를 보면 진짜 몸통이 '타-'라는 걸 쉽게 알 수 있습니다.", hint: "🚌 몸통 글자 뒤에 기본 꼬리 '-다'를 붙이세요." },
+    { forms: "입어요 / 입으면 / 입고 / 입었어요", base: "입다", fbOk: "훌륭합니다! 옷을 내 몸에 걸치는 움직임 낱말의 뼈대를 쏙 뽑아냈네요. 변하지 않는 몸통을 찾는 속도가 점점 빨라지고 있어요!", fbNo: "여러 낱말에서 공통으로 들어있는 '입-'이라는 글자를 찾아보세요. 그 글자에 '-다'를 붙이면 마법처럼 정답이 됩니다.", hint: "👕 항상 똑같이 반복되는 글자 뒤에 '-다'를 붙여요." },
+    { forms: "벗어요 / 벗으면 / 벗고 / 벗었어요", base: "벗다", fbOk: "대단해요! '입다'와 반대되는 행동의 기본형도 단숨에 찾아냈군요. 이렇게 낱말의 짝꿍을 만들어 기억하면 숙달 목표 달성에 큰 도움이 됩니다!", fbNo: "뒤에 붙은 '-어요', '-고' 같은 꼬리표를 조심스레 떼어내 보세요. 남은 뼈대에 기본 꼬리를 붙이면 진짜 이름이 나옵니다.", hint: "🧢 변장한 꼬리를 떼고 원래 꼬리 '-다'를 붙여보세요." },
+    { forms: "신어요 / 신으면 / 신고 / 신었어요", base: "신다", fbOk: "맞아요! 양말이나 신발을 착용하는 행동의 원래 모습을 잘 찾았어요. 물건의 이름(신발)과 움직임(신다)을 잘 짝지어 보세요.", fbNo: "꼬리가 자꾸 바뀌어도 변하지 않는 굳건한 글자가 하나 있습니다. 그 글자를 찾아 '-다'를 붙여주세요.", hint: "👟 변하지 않는 앞글자를 찾아 뒤에 '-다'를 달아주세요." },
+    { forms: "울어요 / 울면 / 울고 / 울었어요", base: "울다", fbOk: "딩동댕! 슬플 때 눈물이 나는 움직임의 기본형을 찾았어요. 이렇게 기본 뼈대 하나에서 수많은 기분과 상황을 표현하는 말이 나온답니다.", fbNo: "'울-' 뒤에 붙은 '-어요', '-면' 같은 꼬리들을 가려보세요. 남은 글자에 탐정의 마법 꼬리 '-다'를 붙여보세요.", hint: "😭 뒤에 붙은 여러 가지 꼬리를 떼고 '-다'를 붙여요." },
+    { forms: "살아요 / 살면 / 살고 / 살았어요", base: "살다", fbOk: "정답! 생명을 유지하며 지내는 움직임 낱말의 기본형이네요. 아주 기본적인 낱말의 뼈대를 튼튼하게 잘 세워가고 있어요.", fbNo: "뒤에 있는 꼬리들이 계속 변하고 있지만, 자리를 지키는 앞글자가 있어요. 그 글자에 '-다'를 붙이면 원래 모습이 됩니다.", hint: "🏠 변하지 않는 몸통을 찾고 뒤에 '-다'를 달아주세요." },
+    { forms: "줘요 / 주면 / 주고 / 주었어요", base: "주다", fbOk: "참 잘했어요! '줘요(주+어요)'처럼 글자가 뭉쳐있어도 진짜 뼈대인 '주-'를 찾아내다니, 낱말 탐정으로서 관찰력이 아주 뛰어납니다!", fbNo: "'줘요'는 '주-'와 '-어요'가 하나로 합체한 글자예요. '주면', '주고'를 보며 숨겨진 진짜 몸통을 추리해 보세요!", hint: "🎁 합체하기 전의 원래 글자를 생각하고 '-다'를 붙여요." },
+    { forms: "받아요 / 받으면 / 받고 / 받았어요", base: "받다", fbOk: "완벽해요! '주다'와 반대되는 움직임의 기본형도 잘 찾았어요. 이렇게 짝꿍 낱말의 진짜 모습을 함께 알아두면 어휘 실력이 훌쩍 자랍니다.", fbNo: "여러 단어에서 계속 변하지 않고 남아있는 '받-'이라는 글자에 집중해 보세요. 그 뒤에 기본 꼬리만 붙이면 끝!", hint: "🤲 똑같이 반복되는 글자 뒤에 '-다'를 붙이세요." },
+    { forms: "마셔요 / 마시면 / 마시고 / 마셨어요", base: "마시다", fbOk: "훌륭합니다! 꿀꺽꿀꺽 물을 넘기는 움직임의 긴 몸통 '마시-'를 정확히 찾아냈어요. '마셔요'에 속지 않은 탐정의 눈썰미를 칭찬해요!", fbNo: "'마셔요'는 '마시-'와 '-어요'가 합체한 모습이에요. '마시고'나 '마시면'을 보면 진짜 뼈대가 세 글자라는 걸 알 수 있어요.", hint: "🥛 합체한 글자를 분리해 세 글자 뼈대 뒤에 '-다'를 붙여요." },
+    { forms: "예뻐요 / 예쁘면 / 예쁘고 / 예뻤어요", base: "예쁘다", fbOk: "대단해요! 1단계에서 배웠던 '상태'를 나타내는 낱말도 이렇게 꼬리가 변한다는 사실! 상태 낱말의 기본형을 아주 훌륭하게 찾아냈습니다.", fbNo: "'예뻐요'는 모양이 살짝 변형된 모습이에요. '예쁘고'를 보면 원래 몸통이 '예쁘-'라는 것을 쉽게 알 수 있습니다.", hint: "🌸 모양이 살짝 변하는 마법! '예쁘고'에서 힌트를 얻으세요." },
+    { forms: "추워요 / 추우면 / 춥고 / 추웠어요", base: "춥다", fbOk: "와, 진짜 어려운 낱말을 맞혔어요! '춥-'이 '추워-'로 마법처럼 크게 변신하는 낱말인데도 원래 뼈대를 정확히 추리해 냈네요! 최고입니다.", fbNo: "아주 특별한 마법 낱말이에요. 'ㅂ' 받침이 숨어있다가 꼬리를 만나면 '우/워'로 변신한답니다. 원래 받침 'ㅂ'을 살려주세요!", hint: "🥶 'ㅂ' 받침이 변신하는 마법 낱말이에요. 원래 뼈대를 찾아 '-다'를 붙여요." },
+    { forms: "더워요 / 더우면 / 덥고 / 더웠어요", base: "덥다", fbOk: "정답! '춥다'와 마찬가지로 마법처럼 변신하는 어려운 상태 낱말의 기본형을 잘 찾았어요. 이런 불규칙한 낱말의 규칙까지 알아채다니 정말 대단해요.", fbNo: "이 낱말도 꼬리를 만나면 'ㅂ' 받침이 '우/워'로 변하는 마법을 부려요. '덥고'를 보며 숨겨진 원래 받침을 찾아보세요!", hint: "🥵 '덥고'라는 낱말에 진짜 몸통의 힌트가 숨어 있어요!" },
+    { forms: "커요 / 크면 / 크고 / 컸어요", base: "크다", fbOk: "참 잘했어요! 크기를 나타내는 상태 낱말의 진짜 모습이네요. 꼬리가 변해도 상태 낱말 역시 기본형은 '-다'로 끝난다는 걸 확실히 배웠습니다.", fbNo: "'커요'는 원래 '크-'에 '-어요'가 붙으면서 모양이 확 줄어든 거예요. '크고'를 보며 진짜 몸통을 추리해 보세요!", hint: "🐘 모양이 쑥 줄어든 글자에 속지 말고 '크고'를 보세요." },
+    { forms: "작아요 / 작으면 / 작고 / 작았어요", base: "작다", fbOk: "완벽해요! '크다'와 반대되는 상태를 나타내는 기본형도 잘 찾았네요. 상태 낱말의 짝꿍들을 이렇게 기본형으로 정리해 두면 아주 좋아요.", fbNo: "여러 단어에서 계속 변하지 않고 굳건히 남아있는 '작-'이라는 글자에 탐정의 꼬리 '-다'를 붙여주세요.", hint: "🐜 계속 똑같이 남아있는 앞글자에 '-다'를 연결하세요." },
+    { forms: "많아요 / 많으면 / 많고 / 많았어요", base: "많다", fbOk: "훌륭합니다! 개수를 나타내는 이 상태 낱말의 기본형을 잘 찾았어요. 받침이 두 개인 낱말도 두려워하지 않고 뼈대를 잘 솎아냈습니다!", fbNo: "복잡한 겹받침 글자지만 뼈대는 변하지 않아요. 꼬리들을 떼어내고 본래의 몸통에 '-다'를 붙여 원래 모습을 완성하세요.", hint: "🍎🍏 겹받침 글자도 당황하지 말고 뒤에 '-다'를 붙여보세요." },
+    { forms: "적어요 / 적으면 / 적고 / 적았어요", base: "적다", fbOk: "대단해요! 수나 양이 적은 상태를 나타내는 기본형도 단숨에 찾았군요. 사전에서 이제 어떤 모양을 찾아야 하는지 완벽히 마스터했어요!", fbNo: "'적-' 뒤에 붙은 '-어요', '-고' 같은 꼬리들을 가려보세요. 남은 글자에 기본 꼬리 '-다'를 붙이면 낱말의 원래 모습이 완성됩니다.", hint: "💧 변장한 꼬리를 떼고 '-다'를 붙이는 탐정 규칙을 적용해요." },
+    { forms: "길어요 / 길면 / 길고 / 길었어요", base: "길다", fbOk: "정답! 길이를 나타내는 상태 낱말의 진짜 모습이네요. 이렇게 기본형을 알면 '긴', '기니'처럼 꼬리가 아예 사라지는 변신도 이해하기 쉬워집니다.", fbNo: "꼬리가 자꾸 바뀌어도 변하지 않는 굳건한 글자가 하나 있습니다. 그 글자를 찾아 탐정의 마법 꼬리 '-다'를 붙여주세요.", hint: "📏 변하지 않는 앞글자를 찾아 뒤에 '-다'를 달아주세요." },
+    { forms: "짧아요 / 짧으면 / 짧고 / 짧았어요", base: "짧다", fbOk: "맞아요! 길이가 짧은 상태를 나타내는 이 낱말의 원래 모습도 잘 찾았어요. 받침이 두 개인 낱말의 몸통을 찾는 실력이 아주 훌륭합니다.", fbNo: "복잡한 겹받침 글자지만 뼈대는 절대 변하지 않아요. 꼬리들을 치우고 본래의 몸통 뒤에 '-다'를 붙이세요.", hint: "✏️ 겹받침 글자도 뼈대 뒤에 기본 꼬리 '-다'를 붙여보세요." },
+    { forms: "좋아요 / 좋으면 / 좋고 / 좋았어요", base: "좋다", fbOk: "딩동댕! 기분이나 상태가 훌륭함을 나타내는 이 낱말의 기본형을 찾았네요. '좋다'라는 뼈대가 여러 가지 감정을 표현해 준답니다.", fbNo: "여러 단어에서 공통으로 들어있는 '좋-'이라는 글자를 찾아보세요. 그 글자에 '-다'를 붙이면 마법처럼 정답이 됩니다.", hint: "👍 항상 똑같이 반복되는 글자 뒤에 '-다'를 붙여요." },
+    { forms: "나빠요 / 나쁘면 / 나쁘고 / 나빴어요", base: "나쁘다", fbOk: "정답! '나빠요'처럼 모양이 살짝 바뀌어도 '나쁘-'라는 진짜 뼈대를 잘 추리해 냈어요. 마법처럼 변하는 상태 낱말의 규칙을 잘 이해했네요!", fbNo: "'나빠요'는 모양이 살짝 변형된 모습이에요. '나쁘고'를 보면 원래 몸통이 세 글자짜리 '나쁘-'라는 것을 쉽게 알 수 있습니다.", hint: "👎 모양이 살짝 변하는 마법! '나쁘고'에서 힌트를 얻으세요." },
+    { forms: "높아요 / 높으면 / 높고 / 높았어요", base: "높다", fbOk: "참 잘했어요! 위아래 위치가 어떠한지 나타내는 상태 낱말의 기본형이네요. 사전을 찾을 때 변장한 꼬리를 떼어내는 훈련이 아주 잘 되어있어요.", fbNo: "'높-'이라는 글자는 계속 똑같이 나타나죠? 뒤에 있는 변장한 꼬리들을 모두 치우고 기본 꼬리 '-다'를 달아주세요.", hint: "🏔️ 계속 똑같이 남아있는 앞글자에 '-다'를 연결하세요." },
+    { forms: "낮아요 / 낮으면 / 낮고 / 낮았어요", base: "낮다", fbOk: "완벽해요! '높다'와 반대되는 상태를 나타내는 기본형도 잘 찾았습니다. 짝꿍 낱말들의 진짜 이름표를 정확히 알고 나니 국어가 더 재미있어지죠?", fbNo: "뒤에 있는 꼬리들이 계속 변하고 있지만, 자리를 꿋꿋이 지키는 앞글자가 있어요. 그 글자에 '-다'를 붙여보세요.", hint: "📉 변하지 않는 뼈대를 찾고 뒤에 '-다'를 달아주세요." },
+    { forms: "귀여워요 / 귀여우면 / 귀엽고 / 귀여웠어요", base: "귀엽다", fbOk: "훌륭합니다! 아주 길고 복잡하게 변신하는 마법 낱말인데, 진짜 몸통과 원래 받침 'ㅂ'을 정확히 찾아냈어요! 정말 최고의 탐정입니다.", fbNo: "'춥다', '덥다'와 같은 마법 낱말이에요. 꼬리를 만나면 'ㅂ' 받침이 '우/워'로 변신해요. '귀엽고'에서 원래 받침을 찾아보세요!", hint: "🐰 'ㅂ' 받침이 변신하는 마법 낱말! '귀엽고'를 살펴보세요." },
+    { forms: "무거워요 / 무거우면 / 무겁고 / 무거웠어요", base: "무겁다", fbOk: "대단해요! 무게를 나타내는 어려운 상태 낱말의 기본형도 단숨에 추리해 냈군요. 꼬리에 따라 뼈대가 살짝살짝 변하는 규칙을 완벽히 마스터했습니다!", fbNo: "꼬리에 따라 '무거워'로 변신하지만, 진짜 몸통에는 'ㅂ' 받침이 있어요. '무겁고'를 통해 숨겨진 진짜 모습을 확인해 보세요.", hint: "🏋️ 'ㅂ' 받침 마법 낱말! 원래 뼈대를 찾아 '-다'를 붙여요." },
+    { forms: "가벼워요 / 가벼우면 / 가볍고 / 가벼웠어요", base: "가볍다", fbOk: "정답! '무겁다'와 반대되는 상태의 기본형이네요. 불규칙하게 변신하는 낱말들도 이제는 눈감고도 원래 모습을 찾을 수 있을 만큼 숙달되었어요.", fbNo: "이 낱말도 꼬리를 만나면 'ㅂ' 받침이 '우/워'로 변하는 마법을 부려요. '가볍고'를 보며 숨겨진 원래 받침을 찾아보세요!", hint: "🎈 '가볍고'라는 낱말에 진짜 몸통의 힌트가 숨어 있어요!" },
+    { forms: "들어요 / 들으면 / 듣고 / 들었어요", base: "듣다", fbOk: "앗, 엄청난 함정이었는데! '들-'로 변신했지만 원래 몸통은 '듣-'이라는 걸 완벽하게 추리해 냈어요! 소리를 듣는 동작의 기본형을 잘 찾았습니다.", fbNo: "'걸어요(걷다)'와 비슷한 마법을 쓰는 낱말이에요. '들-'로 변신하기도 하지만, '듣고'를 보면 진짜 원래 받침이 'ㄷ'인 것을 알 수 있어요!", hint: "👂 모양이 'ㄹ'로 변하는 마법 낱말! 원래 받침은 'ㄷ'이에요." },
+    { forms: "그려요 / 그리면 / 그리고 / 그렸어요", base: "그리다", fbOk: "참 잘했어요! 도화지에 그림을 그리는 움직임의 기본 몸통 '그리-'를 잘 찾아냈습니다. 합체된 글자에 속지 않는 실력이 대단해요.", fbNo: "'그려요'는 '그리-'와 '-어요'가 합체한 거예요. '그리고', '그리면'을 보면 진짜 몸통이 세 글자라는 걸 알 수 있어요.", hint: "🎨 합체한 글자를 분리해 원래 뼈대 뒤에 '-다'를 붙여요." },
+    { forms: "불러요 / 부르면 / 부르고 / 불렀어요", base: "부르다", fbOk: "완벽해요! 노래를 하거나 친구를 찾는 움직임의 뼈대 '부르-'를 정확히 찾았네요. '불러요'로 묘하게 합체해도 원래 몸통을 알아내는 실력이 뛰어납니다.", fbNo: "'불러요'는 원래 몸통인 '부르-'에 꼬리가 붙으면서 모양이 특이하게 변신한 거예요. '부르고'를 보며 진짜 몸통을 추리해 보세요!", hint: "🎤 변신술에 속지 말고 '부르고'에서 진짜 몸통을 찾으세요." },
+    { forms: "배워요 / 배우면 / 배우고 / 배웠어요", base: "배우다", fbOk: "딩동댕! 새로운 것을 익히는 이 움직임 낱말의 진짜 모습도 훌륭하게 찾아냈습니다. 우리 낱말 탐정님이 기본형 찾기를 완전히 마스터했어요! 축하합니다!", fbNo: "'배워요'는 '배우-'와 '-어요'가 빠르게 합체한 모습이에요. '배우고'를 보면 원래 몸통이 세 글자라는 것을 금방 알 수 있습니다.", hint: "🏫 합체하기 전의 원래 글자를 생각하고 '-다'를 붙여요." }
+  ];
+
+  // 3단계: 문장 속 기본형 찾기
+  let STAGE3 = [
+    { s: "봄에 피는 꽃이 정말 예뻐요.", target: "예뻐요", type: 3, base: "예쁘다", fbOk: "완벽한 탐정입니다! 꽃의 아름다운 상태를 나타내는 말이고, 꼬리가 변하기 전의 진짜 이름표는 **'예쁘다'**라는 것을 완벽하게 추리했어요!", fbNoType: "꽃이 스스로 움직이는 행동일까요? 아니에요. 꽃의 모습이나 느낌 등 '어떤 상태인지' 설명해 주는 말이라는 점을 떠올려 보세요.", fbNoBase: "'예뻐요'는 꼬리가 변하면서 모양이 살짝 바뀐 상태예요. 진짜 뼈대를 찾아 기본 꼬리 **'-다'**를 붙여보세요!", hint: "🌸 어떤 모습인지 나타내는 낱말이에요. '예쁘-' 뒤에 '-다'를 붙여요." },
+    { s: "운동장에서 친구들과 신나게 달려요.", target: "달려요", type: 2, base: "달리다", fbOk: "대단해요! 몸을 바쁘게 움직이는 행동임을 알고, 합체된 꼬리를 떼어내 **'달리다'**라는 원래 모습을 훌륭하게 찾아냈습니다.", fbNoType: "가만히 있는 물건의 이름일까요? 문장 속 주인공이 체육 시간에 어떤 **'행동'**이나 **'움직임'**을 하고 있는지 머릿속으로 그려보세요.", fbNoBase: "'달려요'는 원래 몸통 뒤에 꼬리가 붙어 합체한 모습이에요. 합체하기 전의 진짜 몸통 뒤에 **'-다'**를 달아주세요.", hint: "🏃‍♂️ 다리를 뻗어 나아가는 몸통 글자를 찾고 '-다'를 붙이세요." },
+    { s: "내 필통에는 새로 산 연필이 있습니다.", target: "연필이", type: 1, base: "연필", fbOk: "훌륭합니다! 필기구를 부르는 이름이라는 것을 알고, 뒤에 붙은 '-이'를 떼어내 진짜 이름만 쏙 뽑아내는 실력이 최고예요.", fbNoType: "동작이나 상태를 나타내는 말이 아니에요. 필통 속에 들어 있는 그 물건 자체를 부르는 **'이름'**이 무엇인지 생각해 보세요.", fbNoBase: "문장 속에서는 낱말 뒤에 짝꿍 글자(-이, -가)가 붙어있어요. 짝꿍을 살짝 떼어내고 진짜 물건의 이름만 적어보세요.", hint: "✏️ 뒤에 붙은 글자를 떼어내고 원래 이름표만 적으세요." },
+    { s: "아침에 일어나서 맛있게 밥을 먹어요.", target: "먹어요", type: 2, base: "먹다", fbOk: "명탐정 등장! 음식을 삼키는 움직임을 나타내는 말의 뼈대인 '먹-'을 찾아 진짜 모습을 정확히 완성했어요. 사전 찾기의 고수가 되었네요!", fbNoType: "밥이나 반찬의 이름일까요? 맛있는 밥을 입에 넣고 오물오물 씹는 나의 **'행동'**을 문장 속에서 생생하게 상상해 보세요.", fbNoBase: "변장한 꼬리 '-어요'를 살짝 떼어내 볼까요? 변하지 않는 굳건한 몸통을 찾아 원래 꼬리인 **'-다'**를 붙여주세요.", hint: "🍱 꼬리를 치우고 진짜 뼈대 뒤에 '-다'를 붙여보세요." },
+    { s: "겨울이 되면 눈이 내리고 아주 추워요.", target: "추워요", type: 3, base: "춥다", fbOk: "완벽해요! 겨울의 날씨 상태를 나타내는 말임을 알고, 마법처럼 변신한 'ㅂ' 받침까지 찾아내어 **'춥다'**를 완성하다니 놀랍습니다.", fbNoType: "몸을 직접 움직이는 행동일까요? 한겨울 밖에 나갔을 때 내 몸이 느끼는 날씨나 기분이 어떤 **'상태'**인지 설명해 주는 말이에요.", fbNoBase: "'우/워'로 변신한 마법 낱말이에요! 원래 몸통에는 'ㅂ' 받침이 숨어있답니다. 진짜 받침을 찾아 **'-다'**를 연결하세요.", hint: "🥶 숨어있는 'ㅂ' 받침을 살려 원래 모습을 만들어보세요." },
+    { s: "도서관에서 재미있는 동화책을 읽어요.", target: "읽어요", type: 2, base: "읽다", fbOk: "정답입니다! 글자를 소리 내거나 눈으로 보는 움직임의 진짜 뼈대를 잘 찾았어요. 이렇게 낱말의 원래 모습을 알면 책 읽기가 더 즐거워져요!", fbNoType: "동화책이라는 물건의 이름이 아니에요. 책을 펴놓고 내 눈동자와 입술이 바쁘게 움직이는 **'행동'**을 나타낸다는 점을 기억하세요.", fbNoBase: "뒤에 붙은 '-어요' 같은 꼬리표를 떼어내 보세요. 남은 앞글자에 마법 꼬리 **'-다'**를 달아주면 원래 이름이 나옵니다.", hint: "📖 늘 똑같이 자리를 지키는 앞글자에 '-다'를 붙여요." },
+    { s: "교실에 있는 내 책상을 깨끗하게 닦았어요.", target: "책상을", type: 1, base: "책상", fbOk: "참 잘했어요! 교실에 있는 가구의 이름임을 정확히 알고, 뒤에 붙은 짝꿍(-을)을 떼어내어 본래 낱말만 깔끔하게 분리해 냈네요.", fbNoType: "닦거나 움직이는 동작이 아니에요. 내가 매일 앉아서 공부하는 그 딱딱한 가구를 무엇이라고 부르는지 **'이름'**을 떠올려 보세요.", fbNoBase: "이 낱말은 뒤에 짝꿍 글자(-을)와 손을 잡고 있어요. 손을 놓고 진짜 가구의 이름만 혼자 남겨보세요.", hint: "🪑 뒤에 붙은 짝꿍 글자를 떼어내고 진짜 이름만 적어요." },
+    { s: "재미있는 이야기를 듣고 크게 웃었어요.", target: "웃었어요", type: 2, base: "웃다", fbOk: "대단해요! 소리를 내며 기뻐하는 움직임의 긴 꼬리(-었어요)에 속지 않고, 진짜 뼈대 '웃-'을 쏙 뽑아내는 관찰력이 빛납니다!", fbNoType: "재미있는 기분 자체는 상태지만, 입꼬리를 올리고 '하하' 소리를 내는 나의 명확한 **'행동'**과 동작을 표현하는 말이에요.", fbNoBase: "'-었어요'처럼 길게 변장한 꼬리를 모두 지워보세요. 꿋꿋하게 자리를 지키는 앞글자 뒤에 **'-다'**를 붙이세요.", hint: "😄 길게 변장한 꼬리를 떼고 앞글자에 '-다'를 붙여보세요." },
+    { s: "가방에 책이 너무 많아서 아주 무거워요.", target: "무거워요", type: 3, base: "무겁다", fbOk: "훌륭합니다! 짐을 들었을 때의 상태를 나타내는 말의 어려운 마법 변신 규칙을 알아채고, 본래 받침을 찾아 훌륭하게 완성했어요!", fbNoType: "가방이나 책의 이름이 아니에요. 짐을 번쩍 들었을 때 내 팔과 어깨가 느끼는 느낌이나 **'상태'**가 어떠한지 묘사하는 말이에요.", fbNoBase: "꼬리에 따라 '워'로 변신했지만, 이 낱말의 진짜 몸통에는 'ㅂ' 받침이 있어요. 원래 받침을 찾아 **'-다'**를 붙이세요.", hint: "🏋️ 'ㅂ' 받침이 숨어있는 마법 낱말! 원래 뼈대를 찾아보세요." },
+    { s: "우리 집에는 귀여운 강아지가 꼬리를 흔들어요.", target: "강아지가", type: 1, base: "강아지", fbOk: "맞습니다! 동물을 부르는 이름이라는 것을 잘 구분했고, 뒤에 붙은 짝꿍 글자를 떼어내는 규칙도 완벽하게 적용했어요!", fbNoType: "꼬리를 흔드는 행동이 아니에요. 내 옆에서 뛰어노는 그 털 달린 작고 귀여운 동물을 부르는 **'이름'**이라는 점을 생각해 보세요.", fbNoBase: "이 낱말은 문장 안에서 짝꿍 글자(-가)와 함께 있어요. 짝꿍을 살짝 떼고 동물의 원래 이름만 적어주세요.", hint: "🐶 짝꿍 글자를 지우고 동물의 원래 이름만 남겨보세요." },
+    { s: "피곤해서 침대에 눕자마자 스르르 잤어요.", target: "잤어요", type: 2, base: "자다", fbOk: "정답! 눈을 감고 쉬는 움직임을 나타내는 말이죠. 꼬리가 합체해 모양이 짧아진 낱말의 숨겨진 진짜 모습을 멋지게 찾아냈어요.", fbNoType: "침대나 이불 같은 물건이 아니에요. 피곤할 때 내 몸이 침대에서 쿨쿨 무엇을 하는지 그 **'동작'**을 머릿속에 그려보세요.", fbNoBase: "'잤어요'는 몸통과 뒤에 붙은 꼬리가 완전히 합체한 거예요. '자고', '자면'을 떠올리며 원래 몸통 뒤에 **'-다'**를 붙이세요.", hint: "🛏️ 합체하기 전의 진짜 몸통을 생각하고 '-다'를 붙여요." },
+    { s: "치타는 동물 중에서 가장 빨라요.", target: "빨라요", type: 3, base: "빠르다", fbOk: "완벽해요! 속도가 어떤지 나타내는 상태 낱말의 진짜 모습이네요. '빨라요'처럼 모양이 바뀌어도 원래 모습을 단숨에 찾는 탐정이 되었어요!", fbNoType: "치타가 다리를 움직이는 행동 자체가 아니에요. 치타가 달릴 때의 그 놀라운 속도가 어떠한지 나타내는 **'상태'**예요.", fbNoBase: "'빨라요'는 모양이 변형된 모습이에요. '빠르고', '빠르면'을 보면 원래 몸통이 '빠르-'라는 것을 쉽게 알 수 있어요.", hint: "⚡ 모양이 변하기 전인 '빠르고'에서 힌트를 얻어 '-다'를 붙이세요." },
+    { s: "매일 아침 친구들과 함께 학교에 갑니다.", target: "학교에", type: 1, base: "학교", fbOk: "참 잘했어요! 공부하러 가는 장소의 이름임을 파악하고, 뒤에 장소를 나타내는 말(-에)을 떼어내어 깨끗한 사물 이름표를 찾아냈습니다.", fbNoType: "걸어가는 움직임이 아니에요. 우리가 아침마다 가방을 멘 채 도착하는 그 건물을 부르는 **'이름'**이에요.", fbNoBase: "문장 속에서 '-에'라는 짝꿍과 붙어 있어요. 짝꿍을 집에 보내고 장소의 진짜 이름만 적어주세요.", hint: "🏫 뒤에 붙은 장소 짝꿍 글자를 떼어내고 본래 이름만 적어요." },
+    { s: "일기장에 오늘 있었던 일을 정성껏 썼어요.", target: "썼어요", type: 2, base: "쓰다", fbOk: "딩동댕! 연필로 글씨를 남기는 움직임의 원래 모습을 찾았네요. 모양이 '썼어요'로 합체해도 진짜 몸통인 '쓰-'를 구별하는 능력이 대단해요.", fbNoType: "일기장이나 연필이라는 이름이 아니에요. 연필을 들고 내가 직접 손을 움직여 글자를 남기는 **'행동'**을 상상해 보세요.", fbNoBase: "'썼어요'는 뼈대와 꼬리가 강하게 합체한 모습이에요. '쓰고', '쓰면'을 보며 숨겨진 진짜 몸통을 추리해 **'-다'**를 붙이세요.", hint: "✍️ 합체한 글자를 분리해 원래 글자에 '-다'를 붙여요." },
+    { s: "비가 오는 날에는 꼭 우산을 써야 합니다.", target: "우산을", type: 1, base: "우산", fbOk: "정답입니다! 비를 막아주는 물건의 이름을 잘 찾았어요. 뒤에 붙은 글자를 떼어내고 사물의 원래 형태를 솎아내는 연습이 아주 잘 되고 있어요.", fbNoType: "비를 막아주는 행동이 아니에요. 내 머리 위로 펼쳐서 비를 맞지 않게 도와주는 그 고마운 물건의 **'이름'**이 무엇인지 떠올려 보세요.", fbNoBase: "뒤에 물건을 가리키는 짝꿍 글자(-을)가 붙어 있네요. 짝꿍을 가리고 진짜 물건의 이름만 깨끗하게 남겨보세요.", hint: "☂️ 짝꿍 글자를 떼고 물건의 원래 이름만 정확히 적으세요." },
+    { s: "색종이와 가위로 예쁜 꽃을 만들어요.", target: "만들어요", type: 2, base: "만들다", fbOk: "대단해요! 무언가를 뚝딱뚝딱 완성하는 움직임 낱말의 진짜 모습이네요. 뒤에 길게 붙은 꼬리표를 떼어내는 솜씨가 일품입니다.", fbNoType: "가위나 색종이의 이름이 아니에요. 손을 바쁘게 움직여서 예쁜 작품을 짠! 하고 완성해 내는 나의 **'동작'**을 그려보세요.", fbNoBase: "'만들-' 뒤에 붙은 '-어요' 같은 변장한 꼬리들을 가려보세요. 변하지 않는 남은 앞글자에 꼬리 **'-다'**를 붙이세요.", hint: "🛠️ 뒤에 붙은 꼬리를 치우고 원래 몸통에 '-다'를 붙여보세요." },
+    { s: "냄비에 끓고 있는 국물은 아주 뜨거워요.", target: "뜨거워요", type: 3, base: "뜨겁다", fbOk: "훌륭합니다! 온도가 어떤지 나타내는 낱말의 어려운 변신 규칙을 꿰뚫어 보았어요. 상태를 나타내는 마법 낱말의 원래 모습을 완벽하게 찾아냈습니다.", fbNoType: "국물이 부글부글 끓는 움직임일까요? 손을 댔을 때 깜짝 놀라며 느끼는 그 온도나 **'상태'**에 집중해 보세요.", fbNoBase: "'우/워'로 변신한 마법 낱말이에요. '뜨겁고'를 생각하며 숨어있던 'ㅂ' 받침을 살려 마법 꼬리 **'-다'**를 붙여주세요.", hint: "♨️ 숨어있는 진짜 받침 'ㅂ'을 찾아 '-다'를 연결하세요." },
+    { s: "수학 문제를 모를 때는 선생님께 여쭤봅니다.", target: "선생님께", type: 1, base: "선생님", fbOk: "맞아요! 우리를 도와주시는 어른을 부르는 이름이죠. 뒤에 높임의 뜻을 나타내는 짝꿍 글자(-께)를 분리해 내어 본래 이름표만 쏙 뽑은 점을 칭찬해요!", fbNoType: "가르쳐 주시는 움직임이 아니에요. 우리 반에서 나를 가장 많이 도와주시는 그 특별한 역할을 가진 사람의 **'이름'**을 생각해 보세요.", fbNoBase: "뒤에 붙은 '-께'는 문장에서 인사를 나타내는 짝꿍이에요. 짝꿍을 조심스레 떼어내고 사람의 이름만 남겨보세요.", hint: "👩‍🏫 뒤에 붙은 높임말 짝꿍을 떼고 진짜 이름만 적어요." },
+    { s: "어제 저녁에 가족들과 재미있는 영화를 봤어요.", target: "봤어요", type: 2, base: "보다", fbOk: "정답! 눈을 떠서 무언가를 감상하는 행동이에요. 꼬리가 완전히 합체해 버려도 원래 모습 '보-'를 추리해 낸 실력이 대단해요!", fbNoType: "텔레비전이나 영화라는 사물의 이름이 아니에요. 화면을 향해 내 눈동자가 집중하고 향하는 그 **'동작'**을 떠올려 보세요.", fbNoBase: "'봤어요'는 '보-'와 뒤에 붙은 꼬리가 꽉 합체한 글자예요. '보고', '보면'을 살펴보며 원래 뼈대가 무엇인지 힌트를 얻으세요.", hint: "👀 합체하기 전의 원래 글자 '보-' 뒤에 '-다'를 붙여요." },
+    { s: "간식으로 새콤달콤한 사과를 먹었습니다.", target: "사과를", type: 1, base: "사과", fbOk: "참 잘했어요! 맛있고 둥근 과일의 이름이죠. 이제 문장 속에서 뒤에 어떤 글자가 붙어있든 낱말의 본래 형태(이름)를 찾아내는 탐정이 되었어요.", fbNoType: "과일을 아삭아삭 씹는 움직임이 아니에요. 우리가 한 입 베어 무는 그 빨갛고 둥근 대상의 **'이름'**이 무엇인지 떠올려 보세요.", fbNoBase: "사과 뒤에 붙어있는 짝꿍 글자(-를)를 살짝 떼어내 보세요. 모양이 변하지 않는 과일의 진짜 이름만 정답으로 적어주세요.", hint: "🍎 짝꿍 글자를 떼어내고 과일의 진짜 이름표만 찾아 적으세요." },
+    { s: "공원 산책로를 따라 천천히 걸어요.", target: "걸어요", type: 2, base: "걷다", fbOk: "와, 최고 난이도의 탐정입니다! 'ㄹ'로 모양이 바뀌는 마법 움직임 낱말인데, 진짜 몸통인 'ㄷ' 받침을 찾아내어 완벽한 모습을 만들었어요!", fbNoType: "가만히 있는 길이 아니라, 그 길 위에서 내 두 다리가 앞으로 가기 위해 어떻게 '움직이는지' 떠올려 보세요.", fbNoBase: "이 낱말은 마법사처럼 '걸-'로 살짝 변신하기도 해요. 하지만 '걷고'를 생각하며 원래 받침 **'ㄷ'**을 살려 **'-다'**를 붙여보세요.", hint: "🚶‍♂️ 'ㄹ'이 'ㄷ'으로 바뀌는 마법 낱말이에요. 원래 뼈대를 찾아보세요." },
+    { s: "동물원에 있는 코끼리는 덩치가 아주 커요.", target: "커요", type: 3, base: "크다", fbOk: "완벽해요! 크기를 나타내는 상태 낱말의 진짜 모습이네요. '커요'처럼 모양이 확 줄어들어도 속지 않고 원래 몸통을 멋지게 찾아냈어요.", fbNoType: "코끼리가 스스로 몸을 부풀리는 동작일까요? 엄청난 크기를 자랑하는 동물의 덩치가 어떠한지 설명하는 '상태' 낱말이라는 점을 기억하세요.", fbNoBase: "'커요'는 원래 '크-' 뼈대에 꼬리가 붙으면서 모양이 변한 거예요. '크고', '크면'을 보며 진짜 몸통을 추리해 보세요!", hint: "🐘 모양이 줄어든 글자에 속지 말고 본래 뼈대 뒤에 '-다'를 붙여요." },
+    { s: "등교할 준비를 하고 내 가방을 멥니다.", target: "가방을", type: 1, base: "가방", fbOk: "딩동댕! 학교 갈 때 꼭 필요한 물건의 이름을 잘 찾았습니다. 짝꿍 글자를 분리해 내는 능력이 이제 완전히 몸에 배었군요!", fbNoType: "물건을 등에 매다는 동작이 아니에요. 내 등 뒤에 찰싹 붙어서 물건을 보관해 주는 그 주머니의 **'이름'**을 생각해 보세요.", fbNoBase: "낱말 뒤에 붙은 '-을'이라는 짝꿍 글자를 떼어내 보세요. 언제나 변하지 않는 물건의 원래 이름표만 쏙 남겨보세요.", hint: "🎒 뒤에 붙은 글자를 지우고 원래 사물의 이름만 정확히 적어요." },
+    { s: "동생이 작고 귀여운 레고 블록을 가지고 놀아요.", target: "놀아요", type: 2, base: "놀다", fbOk: "정답입니다! 장난감을 가지고 신나게 움직이는 행동의 원래 모습을 잘 찾았어요. 변장한 옷을 벗기고 뼈대를 솎아내는 실력이 탁월합니다.", fbNoType: "레고 블록이라는 장난감 이름이 아니에요. 장난감을 가지고 즐겁게 뛰고 손을 꼬물거리는 동생의 **'행동'**이 무엇인지 생각해 보세요.", fbNoBase: "'놀-' 뒤에 여러 가지 옷을 입혀놓은 모습이에요. 변장한 옷들을 모두 벗기고 원래 꼬리인 **'-다'**를 단정하게 입혀주세요.", hint: "🎠 꼬리를 떼고 '-다'를 붙이는 탐정 규칙을 적용해요!" },
+    { s: "땅바닥에 기어가는 개미는 정말 작아요.", target: "작아요", type: 3, base: "작다", fbOk: "대단해요! 크기가 어떠한지 나타내는 상태의 모습도 단숨에 찾았군요. 크기를 나타내는 말들을 원래 모습으로 정리하는 습관이 아주 좋아요.", fbNoType: "개미가 작아지는 마술 춤을 추는 걸까요? 아주 조그마한 대상을 보았을 때 그 크기가 어떠한지 묘사하는 **'상태'**를 나타내는 말이에요.", fbNoBase: "뒤에 붙은 '-아요' 같은 변장한 꼬리표를 떼어내 보세요. 계속 변하지 않고 굳건히 남아있는 앞글자에 **'-다'**를 붙이세요.", hint: "🐜 계속 똑같이 남아있는 앞글자에 '-다'를 연결하세요." },
+    { s: "두발 자전거를 타는 방법을 처음 배웠습니다.", target: "자전거를", type: 1, base: "자전거", fbOk: "훌륭합니다! 페달을 밟아 굴러가는 탈것의 이름이죠. 문장 속에서 다른 말과 합쳐져 있어도 본래의 이름만 분리하는 실력이 완벽합니다.", fbNoType: "바퀴가 굴러가는 움직임 자체는 아니에요. 바퀴가 두 개 달린 그 탈것 물건 자체를 부르는 말이 무엇인지 생각해 보세요.", fbNoBase: "자전거 뒤에 찰싹 달라붙은 짝꿍 글자(-를)를 살짝 밀어내 보세요. 모양이 고정된 물건의 이름만 깨끗하게 남을 거예요.", hint: "🚲 탈것의 원래 이름표만 남기고 뒤에 붙은 글자는 지워요." },
+    { s: "날씨가 추워서 두꺼운 외투를 챙겨 입었어요.", target: "입었어요", type: 2, base: "입다", fbOk: "참 잘했어요! 옷을 내 몸에 걸치는 움직임 낱말의 뼈대를 쏙 뽑아냈네요. 길게 변장한 꼬리들을 한 번에 치워버린 탐정의 눈썰미를 칭찬해요.", fbNoType: "외투나 바지 같은 옷의 이름이 아니에요. 그 옷에 팔과 다리를 쏙 집어넣어 내 몸에 맞추는 바쁜 **'행동'**이 무엇인지 떠올려 보세요.", fbNoBase: "'-었어요'처럼 여러 글자가 합쳐진 긴 꼬리를 조심스레 떼어내 보세요. 남은 단단한 뼈대 뒤에 기본 꼬리 **'-다'**를 붙이세요.", hint: "👕 항상 똑같이 반복되는 앞글자 뒤에 '-다'를 달아주세요." },
+    { s: "미술 시간에 쓸 색연필은 길이가 아주 길어요.", target: "길어요", type: 3, base: "길다", fbOk: "정답! 길이가 어떠한지 나타내는 상태 낱말의 진짜 모습이네요. '길고', '길면'처럼 꼬리가 어떻게 바뀌든 뼈대는 변하지 않는다는 걸 잘 배웠습니다.", fbNoType: "색연필이 스스로 쭉쭉 늘어나는 마술일까요? 끝에서 끝까지 거리가 쭈욱 늘어나 있는 그 모양이나 **'상태'**를 묘사하는 말이에요.", fbNoBase: "꼬리가 자꾸 바뀌어도 변하지 않고 굳건히 자리를 지키는 글자가 하나 있습니다. 그 글자를 찾아 마법 꼬리 **'-다'**를 붙여주세요.", hint: "📏 변하지 않는 앞글자를 찾아 뒤에 '-다'를 붙이세요." },
+    { s: "쉬는 시간에 음악실에서 피아노를 쳤어요.", target: "피아노를", type: 1, base: "피아노", fbOk: "맞아요! 건반을 눌러 소리를 내는 악기의 이름이에요. 짝꿍 글자를 떼어내고, 악기라는 변하지 않는 이름의 방에 낱말을 잘 넣었네요.", fbNoType: "손가락으로 건반을 '치는' 것은 움직임이지만, 까맣고 하얀 건반이 있는 그 커다란 악기 자체를 부르는 말은 무엇일까요?", fbNoBase: "이 낱말도 뒤에 '-를'이라는 짝꿍 글자를 달고 있어요. 짝꿍을 떼어내고 건반 악기의 진짜 이름만 정답으로 적어보세요.", hint: "🎹 뒤에 붙은 짝꿍 글자를 가리고 진짜 악기의 이름만 적어요." },
+    { s: "밖에서 놀고 집에 오면 반드시 손을 씻어요.", target: "씻어요", type: 2, base: "씻다", fbOk: "대단해요! 물로 깨끗하게 헹구는 손의 움직임 뼈대를 아주 훌륭하게 찾아냈어요. 원래 모습을 찾는 속도가 점점 빨라지고 있어요!", fbNoType: "비누나 수건이라는 이름이 아니에요. 손을 싹싹 비비고 물로 먼지를 헹궈내는 그 부지런한 **'동작'**을 머릿속에 그려보세요.", fbNoBase: "'씻어요', '씻고'에서 절대 자리를 떠나지 않는 앞글자가 있죠? 변장한 꼬리를 치우고 그 글자 뒤에 **'-다'**를 붙여보세요.", hint: "🧼 낱말의 첫 글자를 잘 살펴보고, 뒤에 '-다'를 붙여보세요." },
+    { s: "몽당연필은 쓰기 불편할 정도로 너무 짧아요.", target: "짧아요", type: 3, base: "짧다", fbOk: "완벽해요! 길이가 줄어든 상태를 나타내는 낱말의 본 모습을 잘 찾았어요. 받침이 두 개인 복잡한 낱말도 두려워하지 않고 뼈대를 솎아냈습니다!", fbNoType: "연필이 스스로 줄어드는 마술을 부렸을까요? 다 써서 꼬마가 되어버린 몽당연필의 현재 모습이나 **'상태'**를 설명하는 말이에요.", fbNoBase: "복잡한 겹받침 글자지만 뼈대는 변하지 않아요. 꼬리를 치우고 본래의 단단한 몸통 뒤에 **'-다'**를 척 붙여주세요.", hint: "✏️ 겹받침 글자도 당황하지 말고 뼈대 뒤에 '-다'를 붙여보세요." },
+    { s: "우리 동네 공원에는 커다란 나무가 많아요.", target: "나무가", type: 1, base: "나무", fbOk: "참 잘했어요! 뿌리를 내리고 자라는 자연물의 이름을 정확히 골라냈습니다. 뒤에 붙은 글자(-가)를 떼어내고 낱말의 가장 순수한 모습을 찾아냈네요.", fbNoType: "가지가 자라나는 움직임이 아니에요. 굵은 기둥과 잎사귀로 이루어진 그 거대한 식물을 우리가 콕 집어서 뭐라고 '부르는지' 떠올려 보세요.", fbNoBase: "나무 뒤에 붙어있는 짝꿍 글자를 떼어내 보세요. 산이나 공원에서 자주 보는 그 식물의 원래 이름표만 찾아 적으세요.", hint: "🌳 문장 속 짝꿍 글자를 지우고 원래 식물 이름만 남겨보세요." },
+    { s: "그네를 높이 타면 하늘을 나는 기분이에요.", target: "타면", type: 2, base: "타다", fbOk: "딩동댕! 놀이기구에 내 몸을 싣는 움직임의 진짜 이름표네요. '타면'처럼 꼬리가 살짝 바뀌어 있어도 뼈대를 완벽하게 추리해 냈습니다.", fbNoType: "그네나 미끄럼틀 같은 놀이기구의 이름이 아니에요. 거기에 엉덩이를 대고 앉아 앞뒤로 슝 나아가는 나의 **'행동'**을 상상해 보세요.", fbNoBase: "'타-' 뒤에 붙은 '-면'이라는 꼬리표를 떼어내 보세요. 가장 기본이 되는 짧은 뼈대에 기본 꼬리 **'-다'**를 붙이면 완성입니다.", hint: "🎠 몸통 글자 뒤에 기본 꼬리 '-다'를 딱 붙이세요." },
+    { s: "한여름에는 햇빛이 뜨거워서 땀이 나고 더워요.", target: "더워요", type: 3, base: "덥다", fbOk: "정답! 땀이 나는 여름의 날씨 상태를 나타내는 말이에요. '추워요'와 마찬가지로 마법처럼 변신하는 어려운 낱말의 뼈대를 멋지게 찾아냈어요!", fbNoType: "햇빛이 쨍쨍 내리쬐는 움직임일까요? 여름 햇빛 아래에서 내 몸이 달아오르며 느끼는 그 찜찜하고 뜨거운 느낌, 바로 **'상태'**를 뜻해요.", fbNoBase: "꼬리를 만나면 '우/워'로 변하는 ㅂ 마법 낱말이에요. '덥고', '덥지'를 생각하며 숨겨진 원래 받침 **'ㅂ'**을 찾아 **'-다'**를 연결하세요.", hint: "🥵 '덥고'라는 낱말에 진짜 몸통의 힌트가 숨어 있어요!" },
+    { s: "하늘을 보니 솜사탕 같은 하얀 구름이 떠 있습니다.", target: "구름이", type: 1, base: "구름", fbOk: "훌륭합니다! 하늘에 둥둥 떠 있는 자연물의 이름을 잘 찾았습니다. 짝꿍 글자(-이) 떼어내기까지 완벽히 해내어, 문장 속 낱말 찾기의 고수가 다 되었어요!", fbNoType: "하늘 위로 흘러가는 움직임이 아니에요. 하늘에 둥둥 떠 있는 그 하얀 수증기 덩어리들을 부르는 **'이름'**이 무엇인지 생각해 보세요.", fbNoBase: "이 낱말도 뒤에 '-이'라는 짝꿍 글자를 달고 있네요. 짝꿍을 떼어내고 하얀 솜사탕 같은 대상의 진짜 이름만 정답으로 적어보세요.", hint: "☁️ 하늘에 떠 있는 자연물의 진짜 이름만 쏙 뽑아내 보세요." },
+    { s: "새들이 날개를 파닥이며 하늘 높이 날아요.", target: "날아요", type: 2, base: "날다", fbOk: "완벽해요! 공중을 슝슝 나아가는 멋진 움직임의 뼈대를 정확히 찾았네요. 합체된 꼬리를 떼고 뼈대 글자를 분리해 내는 실력이 뛰어납니다!", fbNoType: "새나 비행기라는 물건의 이름이 아니에요. 새가 날개를 쫙 펴고 공중에 떠오르는 그 멋진 **'동작'**을 머릿속에 그려보세요.", fbNoBase: "'날아요'는 뼈대인 '날-'과 꼬리 '-아요'가 합쳐진 모습이에요. 진짜 뼈대 '날-'만 남기고 뒤에 기본 꼬리 **'-다'**를 붙여주세요.", hint: "🕊️ 변하지 않는 뼈대를 찾고 뒤에 '-다'를 달아주세요." },
+    { s: "냉장고에서 방금 꺼낸 우유는 아주 차가워요.", target: "차가워요", type: 3, base: "차갑다", fbOk: "대단해요! 온도가 낮은 상태를 나타내는 길고 어려운 마법 낱말인데도, 숨겨진 뼈대와 받침을 완벽히 찾아냈습니다! 최고의 낱말 탐정이에요.", fbNoType: "우유가 스스로 꽁꽁 어는 행동일까요? 차가운 우유 팩을 손으로 쥐었을 때 손바닥이 시리게 느끼는 그 서늘한 느낌, 바로 **'상태'**예요.", fbNoBase: "'추워요'처럼 '워'로 변신했지만 원래 몸통에는 'ㅂ' 받침이 있어요. '차갑고'를 통해 숨겨진 진짜 모습을 확인하고 **'-다'**를 붙이세요.", hint: "🧊 'ㅂ' 받침 마법 낱말! 원래 뼈대를 찾아 '-다'를 붙여요." },
+    { s: "아침 일찍 일어날 수 있도록 알람 시계를 맞췄어요.", target: "시계를", type: 1, base: "시계", fbOk: "정답입니다! 우리에게 시간을 알려주는 물건의 이름이죠. 뒤에 붙은 짝꿍 글자(-를)를 싹둑 자르고, 물건의 원래 모습만 깔끔하게 남겨주었어요.", fbNoType: "바늘이 똑딱똑딱 움직이긴 하지만, 숫자가 적혀 있는 그 둥근 물건 자체를 부르는 **'이름'**이 무엇인지 떠올려 보세요.", fbNoBase: "시계 뒤에 찰싹 달라붙은 짝꿍 글자(-를)를 떼어내 보세요. 시간을 알려주는 그 물건의 언제나 변함없는 이름표만 남겨보세요.", hint: "⏰ 뒤에 붙은 글자를 지우고 원래 사물의 이름만 쏙 적어요." },
+    { s: "줄넘기를 할 때 두 발을 모아서 훌쩍 뛰어요.", target: "뛰어요", type: 2, base: "뛰다", fbOk: "참 잘했어요! 위로 콩콩 솟구치는 생동감 넘치는 움직임의 원래 모습을 잘 찾았네요. 꼬리가 합체되어도 뼈대 글자는 놓치지 않는군요!", fbNoType: "줄넘기라는 물건의 이름이 아니에요. 줄이 넘어올 때 내 두 발이 바닥에서 떨어져 위로 붕 떠오르는 그 **'동작'**을 상상해 보세요.", fbNoBase: "'뛰-'라는 글자가 계속 꿋꿋이 버티고 있죠? 변장한 꼬리를 치우고 단단한 몸통 뒤에 탐정의 꼬리 **'-다'**를 연결하세요.", hint: "🦘 똑같이 반복되는 몸통 글자에 '-다'를 연결해 보세요." },
+    { s: "63빌딩은 끝이 안 보일 정도로 아주 높아요.", target: "높아요", type: 3, base: "높다", fbOk: "딩동댕! 위로 많이 솟아 있는 상태를 나타내는 낱말의 진짜 모습이네요. 위치나 길이를 설명하는 낱말의 원래 모습 찾기를 완벽히 마스터했어요!", fbNoType: "빌딩이 스스로 위로 쑥쑥 솟아오르는 중일까요? 처음부터 하늘에 닿을 듯이 서 있는 건물의 위치가 어떠한지 나타내는 **'상태'**를 말해요.", fbNoBase: "'높-'이라는 글자는 계속 똑같이 튼튼하게 나타나죠? 뒤에 있는 변장한 꼬리들을 모두 지우고 기본 꼬리 **'-다'**를 척 붙여주세요.", hint: "🏔️ 계속 똑같이 남아있는 앞글자에 '-다'를 연결하세요." },
+    { s: "체육관에 들어갈 때는 실내화로 갈아 신어요.", target: "신어요", type: 2, base: "신다", fbOk: "맞아요! 양말이나 신발을 발에 착용하는 행동의 원래 모습을 훌륭하게 찾았어요. 움직임 낱말의 꼬리를 떼어내는 규칙을 잘 이해하고 있네요.", fbNoType: "실내화나 신발은 그냥 물건의 이름이에요. 내 발을 쑥 집어넣어서 끈을 묶거나 발에 맞추는 바쁜 **'동작'**을 나타내는 말이에요.", fbNoBase: "꼬리가 자꾸 바뀌어도 변하지 않는 굳건한 글자 '신-'을 찾아보세요. 그 앞글자에 탐정의 꼬리 **'-다'**를 단정하게 붙여주세요.", hint: "👟 변하지 않는 앞글자를 찾아 뒤에 '-다'를 달아주세요." },
+    { s: "아이스크림은 부드럽고 아주 달아요.", target: "달아요", type: 3, base: "달다", fbOk: "완벽해요! 맛이 어떠한지 나타내는 것도 상태 낱말이라는 점을 놓치지 않았군요. 꼬리가 합체된 모습에서 원래 뼈대를 정확히 솎아냈습니다!", fbNoType: "아이스크림이 스스로 단맛을 뿜어내는 마술일까요? 맛있는 간식이 혀에 닿았을 때 느껴지는 그 기분 좋은 맛, 바로 **'상태'**를 나타내는 말이에요.", fbNoBase: "'달아요'는 몸통과 꼬리가 살짝 합체한 모습이에요. '달고', '달면'을 생각하며 계속 반복되는 몸통 뒤에 **'-다'**를 붙이세요.", hint: "🍭 맛을 나타내는 뼈대를 찾아 뒤에 '-다'를 붙이세요." },
+    { s: "감기에 심하게 걸려서 어제 병원에 다녀왔어요.", target: "병원에", type: 1, base: "병원", fbOk: "정답입니다! 아플 때 찾아가는 장소의 이름을 정확히 골라냈어요. 뒤에 붙은 글자(-에)를 떼어내는 능력을 바탕으로 문장 속 모든 이름표를 찾아낼 기세입니다!", fbNoType: "주사를 놓거나 약을 먹는 동작이 아니에요. 의사 선생님이 계시고 아픈 사람들을 치료해 주는 그 건물을 부르는 **'이름'**을 떠올려 보세요.", fbNoBase: "장소 뒤에 붙어있는 방향 짝꿍 글자(-에)를 떼어내 보세요. 건물의 원래 모양이 변하지 않는 진짜 이름만 쏙 뽑아 정답으로 적으세요.", hint: "🏥 장소를 나타내는 짝꿍 글자를 떼고 진짜 건물 이름만 적어요." },
+    { s: "환기를 시키려고 교실 창문을 활짝 열었어요.", target: "열었어요", type: 2, base: "열다", fbOk: "대단해요! 닫힌 것을 당기거나 치우는 손의 움직임을 아주 쉽게 찾아냈네요. 길게 붙은 '-었어요' 꼬리에 흔들리지 않고 뼈대를 지켜냈습니다.", fbNoType: "창문이나 책상 서랍은 그냥 물건 이름이에요. 닫혀 있는 창문 손잡이를 잡고 옆으로 힘껏 미는 나의 명확한 **'행동'**을 그려보세요.", fbNoBase: "뒤에 길게 붙은 과거의 꼬리표를 모두 떼어내 보세요. 단단하게 남은 '열-' 뼈대에 꼬리 **'-다'**를 달아주면 진짜 이름이 나옵니다.", hint: "🚪 길게 변장한 꼬리를 떼고 앞글자에 '-다'를 붙여보세요." },
+    { s: "떡볶이에 고추장이 많이 들어가서 너무 매워요.", target: "매워요", type: 3, base: "맵다", fbOk: "참 잘했어요! 입안이 화끈거리는 맛의 상태를 나타내는 마법 낱말의 원래 모습을 완벽하게 찾아냈어요. 불규칙한 변신 규칙도 문제없네요!", fbNoType: "고춧가루가 입안에서 춤을 추는 행동일까요? 매운 음식을 먹고 입술이 따갑고 화끈거리며 물을 찾게 되는 그 느낌, 바로 **'상태'**를 말해요.", fbNoBase: "이 낱말도 꼬리를 만나면 '워'로 변하는 마법을 부려요. '맵고'를 보며 꼭꼭 숨겨진 원래 받침 **'ㅂ'**을 찾아 **'-다'**를 연결하세요.", hint: "🌶️ 숨어있는 진짜 받침 'ㅂ'을 찾아 '-다'를 연결하세요." },
+    { s: "동화책 속 주인공은 용감하고 정말 멋져요.", target: "멋져요", type: 3, base: "멋지다", fbOk: "훌륭합니다! 훌륭하고 뛰어난 모습을 나타내는 상태 낱말의 진짜 모습이죠. '멋져요'처럼 글자가 합쳐져도 '멋지-'라는 몸통을 잘 분리해 냈습니다!", fbNoType: "주인공이 용감하게 싸우는 행동 자체일까요? 주인공의 훌륭하고 대단한 모습이나 성격이 어떠한지 평가하고 나타내는 '상태' 낱말이에요.", fbNoBase: "'멋져요'는 '멋지-'와 꼬리가 꽉 합체한 글자예요. '멋지고', '멋지면'을 살펴보며 숨겨진 진짜 뼈대 뒤에 **'-다'**를 붙이세요.", hint: "✨ 합체하기 전의 원래 글자 '멋지-' 뒤에 '-다'를 붙여요." },
+    { s: "여름 방학에는 가족들과 함께 바다로 놀러 갑니다.", target: "바다로", type: 1, base: "바다", fbOk: "정답! 넓고 파란 물이 있는 자연 장소의 이름을 잘 찾았습니다. 뒤에 붙은 짝꿍 글자(-로)까지 완벽하게 잘라내어 깨끗한 사전을 만들었어요.", fbNoType: "파도가 철썩철썩 치고 헤엄치는 동작이 아니에요. 넓은 소금물이 모여 있는 그 거대하고 시원한 장소를 우리가 뭐라고 '부르는지' 생각해 보세요.", fbNoBase: "장소를 나타내는 짝꿍 글자(-로)를 살짝 떼어내 보세요. 여름마다 우리가 즐겁게 찾아가는 그 장소의 이름만 남겨보세요.", hint: "🌊 짝꿍 글자를 떼어내고 넓은 물이 있는 곳의 이름만 적으세요." },
+    { s: "음악 시간에 친구가 부르는 노래를 조용히 들어요.", target: "들어요", type: 2, base: "듣다", fbOk: "딩동댕! 귀로 소리를 받아들이는 움직임을 나타내는 마법 낱말의 최고 난이도 함정을 멋지게 통과했어요! 진짜 받침 'ㄷ'을 잊지 않았군요!", fbNoType: "음악이나 노랫소리라는 이름이 아니에요. 귀를 쫑긋 세우고 스피커에서 흘러나오는 소리에 집중하는 나의 **'동작'**을 상상해 보세요.", fbNoBase: "'걸어요(걷다)'와 똑같은 마법을 써요! '들-'로 변신했지만 '듣고'를 보며 진짜 원래 받침인 **'ㄷ'**을 살려 **'-다'**를 붙이세요!", hint: "👂 모양이 'ㄹ'로 변하는 마법 낱말! 원래 받침은 'ㄷ'이에요." },
+    { s: "소풍 가는 날은 아침부터 기분이 정말 좋아요.", target: "좋아요", type: 3, base: "좋다", fbOk: "맞아요! 마음이 기쁘고 훌륭한 느낌을 나타내는 상태 낱말의 원래 모습이죠. 내 기분이나 상태를 표현할 때 쓰이는 소중한 낱말의 뼈대를 잘 찾았습니다.", fbNoType: "밖으로 뛰어나가 노는 신나는 행동일까요? 소풍을 생각하며 내 마음속에서 몽글몽글 피어나는 그 기분 좋은 느낌이나 **'상태'**를 떠올려 보세요.", fbNoBase: "여러 단어에서 공통으로 튼튼하게 들어있는 '좋-'이라는 글자를 찾아보세요. 그 뼈대 글자에 탐정의 마법 꼬리 **'-다'**를 척 붙여주세요.", hint: "👍 항상 똑같이 반복되는 글자 뒤에 '-다'를 붙여요." },
+    { s: "잃어버린 지우개를 책상 밑에서 다시 찾았어요.", target: "찾았어요", type: 2, base: "찾다", fbOk: "완벽합니다! 숨겨진 물건을 발견해 내는 움직임 낱말의 원래 모습을 단숨에 찾아냈네요. 길고 긴 탐정 놀이의 마지막 50번 문제를 멋지게 장식했습니다!", fbNoType: "지우개나 책상이라는 사물의 이름이 아니에요. 눈을 크게 뜨고 여기저기 살피다가 마침내 물건을 손에 쥐는 기쁜 **'행동'**을 그려보세요.", fbNoBase: "뒤에 있는 과거를 나타내는 꼬리들이 길게 변하고 있지만, 꿋꿋하게 자리를 지키는 앞글자가 있어요. 그 글자에 **'-다'**를 연결하세요.", hint: "🔎 길게 변장한 꼬리를 떼고 앞글자에 '-다'를 붙여보세요." }
+  ];
+
+  /**
+   * 시트에서 받아온 문제 배열로 1·2·3단계 문제 덮어쓰기.
+   * 응답이 없거나 비어 있으면 위의 기본 문제를 그대로 유지한다.
+   */
+  function applyServerQuestions(res) {
+    if (!res) return;
+    if (Array.isArray(res.stage1) && res.stage1.length) STAGE1  = res.stage1;
+    if (Array.isArray(res.stage2) && res.stage2.length) STAGE2A = res.stage2;
+    if (Array.isArray(res.stage3) && res.stage3.length) STAGE3  = res.stage3;
+  }
+
+  // 정답 라벨
+  const LABELS = {
+    1: "① 이름을 나타내는 낱말",
+    2: "② 움직임을 나타내는 낱말",
+    3: "③ 성질이나 상태를 나타내는 낱말"
+  };
+
+  // 종류별 메타 (결과 보고서 등에서 사용)
+  const TYPE_META = {
+    1: { icon: "🏷️", name: "이름" },
+    2: { icon: "💪", name: "움직임" },
+    3: { icon: "✨", name: "성질·상태" }
+  };
+
+  /* ── 동작 상수 ── */
+  const LOCK_MS = 2000;   // 문제 표시 직후 입력 잠금 시간
+  const TOAST_MS = 1400;  // 토스트 표시 시간
+  const TICK_MS = 200;    // 잠금 카운트다운 인터벌
+
+  /* ── 유틸 ── */
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+  function normalizeText(s) { return (s || "").toString().trim().replace(/\s+/g, "").replace(/[.?!]/g, ""); }
+
+  /* =========================================================================
+     연결 설정 — 세 가지 접속 모드 자동 판별
+       1) 학생용 링크 모드 (URL #c=<주소>)
+          · 선생님이 만든 학생용 링크로 접속한 경우
+          · 주소는 메모리에만 저장 (학생 기기의 다른 선생님 자료와 섞이지 않도록)
+          · '선생님 설정' 진입 버튼은 DOM 에서 제거된다
+       2) 교사/저장 모드 (localStorage 에 주소 보관)
+          · 선생님이 본인 기기에서 자료를 저장해 둔 경우
+       3) 체험 모드 (주소 없음)
+          · 처음 들어와서 아무 자료도 연결되지 않은 경우
+          · 학생1~학생30 으로 자유롭게 시연 가능. 결과는 시트에 저장되지 않는다.
+     ========================================================================= */
+
+  const ENDPOINT_KEY = "dict_app_endpoint_v1";
+
+  // 메모리 전용 주소 보관 (학생용 링크 모드 전용)
+  let __memoryEndpoint = "";
+  // 앱 모드: 'student' | 'teacher' | 'demo'
+  window.__APP_MODE = "demo";
+
+  function getEndpoint() {
+    if (window.__APP_MODE === "student") return __memoryEndpoint || "";
+    try { return localStorage.getItem(ENDPOINT_KEY) || ""; } catch (e) { return ""; }
+  }
+  function setEndpoint(url) {
+    try { localStorage.setItem(ENDPOINT_KEY, url); } catch (e) { }
+  }
+  function clearEndpointStore() {
+    try { localStorage.removeItem(ENDPOINT_KEY); } catch (e) { }
+  }
+  function isLikelyEndpoint(url) {
+    if (!url) return false;
+    return /^https:\/\//.test(url) && /\/exec(\?|$)/.test(url);
+  }
+
+  /** 학생용 링크 생성 — # 뒤에 인코딩된 주소를 담는다.
+   *  · 해시 사용 이유: 학생 기기에 영구 저장되지 않고, 링크 자체만으로 동작한다.
+   */
+  function buildStudentLink() {
+    const ep = getEndpoint();
+    if (!ep) return "";
+    return location.origin + location.pathname + "#c=" + encodeURIComponent(ep);
+  }
+
+  /**
+   * 페이지 진입 시 모드를 결정한다.
+   *  · #c=<주소>     → 학생용 링크 모드 (메모리에만 저장)
+   *  · ?cfg=/?api=/?endpoint=<주소>
+   *                  → 옛 버전 호환. localStorage 에 저장한 뒤 주소창은 깔끔히 정리.
+   *  · 그 외에 localStorage 에 주소가 있으면 → 교사/저장 모드
+   *  · 그 외에는 → 체험 모드
+   */
+  function detectAppMode() {
+    // (1) #c= 우선
+    try {
+      const h = (window.location.hash || "").replace(/^#/, "");
+      if (h) {
+        const hp = new URLSearchParams(h);
+        const cFromHash = hp.get("c");
+        if (cFromHash) {
+          __memoryEndpoint = cFromHash;          // get() 은 이미 디코딩된 값
+          window.__APP_MODE = "student";
+          return;
+        }
+      }
+    } catch (e) { }
+
+    // (2) 옛 ?cfg= 호환
+    try {
+      const qs = new URLSearchParams(window.location.search);
+      const cfg = qs.get("cfg") || qs.get("api") || qs.get("endpoint");
+      if (cfg) {
+        setEndpoint(cfg);
+        qs.delete("cfg"); qs.delete("api"); qs.delete("endpoint");
+        const clean = location.pathname + (qs.toString() ? "?" + qs.toString() : "") + location.hash;
+        window.history.replaceState({}, document.title, clean);
+        window.__APP_MODE = "teacher";
+        return;
+      }
+    } catch (e) { }
+
+    // (3) 저장된 주소
+    if (getEndpoint()) { window.__APP_MODE = "teacher"; return; }
+
+    // (4) 체험 모드
+    window.__APP_MODE = "demo";
+  }
+
+  // 페이지 진입 시 바로 판별
+  detectAppMode();
+
+  /**
+   * <script> 태그를 동적으로 추가해 외부 주소에 요청을 보낸다.
+   * (브라우저의 교차 출처 차단을 피하기 위함)
+   *  · 콜백 이름은 매 호출마다 무작위로 새로 만들어 충돌을 피한다.
+   *  · timeoutMs 가 지나면 reject.
+   */
+  function jsonp(action, params, timeoutMs) {
+    return new Promise((resolve, reject) => {
+      const ep = getEndpoint();
+      if (!ep) { reject(new Error("연결 주소가 없습니다.")); return; }
+
+      const cbName = "__cb_" + Math.floor(Math.random() * 1e6) + "_" + Date.now();
+      const sep = ep.indexOf("?") >= 0 ? "&" : "?";
+      const qp = new URLSearchParams(Object.assign({ action: action, callback: cbName }, params || {}));
+      const src = ep + sep + qp.toString();
+
+      let done = false;
+      const script = document.createElement("script");
+
+      const cleanup = () => {
+        try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+        clearTimeout(timer);
+      };
+
+      const timer = setTimeout(() => {
+        if (done) return;
+        done = true; cleanup();
+        reject(new Error("응답 시간 초과"));
+      }, timeoutMs || 12000);
+
+      window[cbName] = (data) => {
+        if (done) return;
+        done = true; cleanup();
+        resolve(data);
+      };
+
+      script.onerror = () => {
+        if (done) return;
+        done = true; cleanup();
+        reject(new Error("요청 실패"));
+      };
+
+      script.src = src;
+      document.head.appendChild(script);
+    });
+  }
+
+  /* =========================================================================
+     상태(STATE) / 기록 카운터
+     ========================================================================= */
+
+  const state = {
+    screen: "home",
+    plan: { count: 10, minutes: 0, range: "step" },
+    queue: [], pointer: 0, current: null, attempts: 0, lockUntil: 0,
+    timer: { enabled: false, endAt: 0, interval: null, expired: false },
+    stats: createInitialStats(0),
+    conceptIndex: 0,
+    bridge: { count: 10, minutes: 0 },
+    nextRange: null,           // 다음 단계 추적
+    returnToPractice: false,   // 개념 다시보기에서 문제로 돌아갈지 여부
+    originalSession: null,     // 첫 풀이의 stats 백업 (재도전 시에도 보고서에 표시)
+    retryMode: false           // 오답 재도전 모드 여부
+  };
+
+  function createInitialStats(total) {
+    return {
+      total: total, correct: 0, wrong: 0,
+      stage1: { c: 0, t: 0 },
+      stage2: { c: 0, t: 0 },
+      stage3: { c: 0, t: 0 },
+      byType: {
+        1: { c: 0, t: 0 },
+        2: { c: 0, t: 0 },
+        3: { c: 0, t: 0 }
+      },
+      correctItems: [],
+      wrongItems: [],
+      wrongQuestions: []
+    };
+  }
+
+  /* ── 3단계 완료 여부 (학생별 로컬 보관) ── */
+  function _stage3DoneKey() {
+    const stu = window.__currentStudent || {};
+    if (!stu.num || !stu.name) return null;
+    return `dict_word_app_stage3_done_${stu.num}_${stu.name}`;
+  }
+  function isStage3Completed() {
+    try {
+      const key = _stage3DoneKey();
+      if (!key) return false;
+      return localStorage.getItem(key) === "1";
+    } catch (e) { return false; }
+  }
+  function markStage3Completed() {
+    try {
+      const key = _stage3DoneKey();
+      if (!key) return;
+      localStorage.setItem(key, "1");
+    } catch (e) { }
+  }
+
+  function getQuestionLabel(q) {
+    if (!q) return "?";
+    if (q.kind === "cat")  return q.word || "";
+    if (q.kind === "base") return q.forms || "";
+    if (q.kind === "sent") return q.target || "";
+    return "?";
+  }
+  function getQuestionAnswer(q) {
+    if (!q) return "?";
+    if (q.kind === "cat")  return LABELS[q.a] || "";
+    if (q.kind === "base") return q.base || "";
+    if (q.kind === "sent") return (LABELS[q.type] || "") + " / " + (q.base || "");
+    return "?";
+  }
+  function getQuestionType(q) {
+    if (!q) return null;
+    if (q.kind === "cat")  return q.a || null;
+    if (q.kind === "sent") return q.type || null;
+    return null;
+  }
+
+  const screenEl = document.getElementById("screen");
+  const statusBar = document.getElementById("statusBar");
+  const toastEl = document.getElementById("toast");
+
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("show");
+    clearTimeout(toastEl._t);
+    toastEl._t = setTimeout(() => toastEl.classList.remove("show"), TOAST_MS);
+  }
+  function setStatusVisible(v) { statusBar.classList.add("hidden"); /* 항상 숨김 */ }
+
+  function updateStatus() {
+    const btnHome = document.getElementById("btnGlobalHome");
+    const btnEnd = document.getElementById("btnGlobalEnd");
+    if (state.screen === "home") {
+      setStatusVisible(false);
+      if (btnHome) btnHome.classList.add("hidden");
+      if (btnEnd) btnEnd.classList.add("hidden");
+      return;
+    }
+    if (btnHome) btnHome.classList.remove("hidden");
+    if (btnEnd) btnEnd.classList.toggle("hidden", state.screen !== "practice");
+    setStatusVisible(true);
+
+    const { count, range } = state.plan;
+    document.getElementById("planText").textContent =
+      `${count}문제·${range === "step" ? "단계별" : range === "stage1" ? "1단계" : range === "stage2" ? "2단계" : "3단계"}`;
+
+    let stTxt = "준비";
+    if (state.screen === "concept") stTxt = `개념(${state.conceptIndex + 1}/5)`;
+    else if (state.screen === "practice") {
+      const k = state.current && state.current.kind;
+      stTxt = k === "cat" ? "1단계" : k === "base" ? "2단계" : "3단계";
+    }
+    else if (state.screen === "result") stTxt = "결과";
+    document.getElementById("stageText").textContent = stTxt;
+
+    const total = state.queue.length || 0;
+    const pos = state.screen === "practice" ? state.pointer + 1 : 0;
+    document.getElementById("posText").textContent = `${Math.min(pos, total)}/${total}`;
+    document.getElementById("progressInner").style.width = total ? `${(pos / total) * 100}%` : "0%";
+    document.getElementById("timerBox").classList.toggle("hidden", !state.timer.enabled);
+  }
+
+  /* =========================================================================
+     홈 화면
+     ========================================================================= */
+
+  function renderHome() {
+    state.screen = "home"; updateStatus();
+    const stage3Done = isStage3Completed();
+    const mixedBtnHtml = stage3Done
+      ? `<button class="retro-btn btn-indigo w-full max-w-xs py-2 text-sm shadow mt-3" onclick="startMixed()">🧩 종합 문제 도전!</button>`
+      : `<button class="retro-btn btn-locked w-full max-w-xs py-2 text-sm mt-3" onclick="showMixedLocked()">🔒 종합 문제 (3단계 완료 후)</button>`;
+
+    screenEl.innerHTML = `
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
+        <div class="retro-box p-6 md:p-7 relative md:col-span-3">
+          <div class="absolute -top-3 -left-3 badge"><span class="pop">1</span><span class="font-black">오늘의 학습 범위</span></div>
+          <div class="mt-8 space-y-4">
+            <div class="text-xl md:text-2xl font-black mb-3">어떤 내용을 공부할까요?</div>
+            <div class="grid grid-cols-1 gap-3">
+              ${[
+                { k: "step",   t: "단계대로 (추천)",                  d: "1~3단계 골고루 연습" },
+                { k: "stage1", t: "1️⃣ 1단계: 낱말의 종류 분류하기",  d: "이름, 움직임, 상태" },
+                { k: "stage2", t: "2️⃣ 2단계: 낱말의 공통 기본형 찾기", d: "여러 형태 → 기본형" },
+                { k: "stage3", t: "3️⃣ 3단계: 문장 속 기본형 찾기",   d: "실전 문장 연습" }
+              ].map(x =>
+                `<button class="retro-btn ${state.plan.range === x.k ? 'btn-indigo' : 'btn-ghost'} py-4 px-5" onclick="setPlanRange('${x.k}')" style="justify-content: flex-start; text-align: left;">
+                  <div class="w-full">
+                    <div class="text-base md:text-lg">${x.t}</div>
+                    <div class="text-sm font-normal opacity-80 mt-0.5">${x.d}</div>
+                  </div>
+                </button>`
+              ).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="retro-box p-6 md:p-7 flex flex-col items-center justify-center text-center md:col-span-2">
+          <div class="text-3xl font-black mb-6">준비됐나요?</div>
+          <button class="retro-btn btn-secondary text-xl w-full max-w-xs mb-3 py-4 shadow-lg" onclick="initConcept()">📖 개념 학습하기</button>
+          <button class="retro-btn btn-primary text-xl w-full max-w-xs py-4 shadow-lg" onclick="showBridge('direct')">🚀 바로 시작!</button>
+          ${mixedBtnHtml}
+        </div>
+      </div>
+    `;
+  }
+  window.setPlanRange = (k) => { state.plan.range = k; renderHome(); }
+
+  /* ── 처음으로 돌아가기 확인 모달 ── */
+  const confirmModal = document.getElementById("confirmModal");
+  let pendingHomeAction = null;
+
+  window.goHomeCheck = () => {
+    if (state.screen === 'practice' || (state.screen === 'concept' && state.returnToPractice)) {
+      const ct = document.getElementById("confirmText");
+      if (ct) ct.innerHTML = "진행 중인 학습을 종료하고<br>처음으로 돌아갈까요?";
+      confirmModal.classList.add("open");
+      pendingHomeAction = () => {
+        stopTimer();
+        state.returnToPractice = false;
+        renderHome();
+      };
+    } else {
+      stopTimer();
+      renderHome();
+    }
+  }
+
+  document.getElementById("btnConfirmNo").onclick = () => {
+    confirmModal.classList.remove("open");
+    pendingHomeAction = null;
+  }
+  document.getElementById("btnConfirmYes").onclick = () => {
+    confirmModal.classList.remove("open");
+    if (pendingHomeAction) pendingHomeAction();
+    pendingHomeAction = null;
+  }
+
+  /* =========================================================================
+     개념 학습 (슬라이드)
+     ========================================================================= */
+
+  function initConcept(fromPractice = false) {
+    if (!CONCEPT_SLIDES || !CONCEPT_SLIDES.length) return;
+
+    if (fromPractice) {
+      state.returnToPractice = true;
+    } else {
+      state.returnToPractice = false;
+      buildQueue();
+    }
+    state.screen = "concept";
+    state.conceptIndex = 0;
+    renderConceptSlide();
+  }
+
+  window.returnToQuestion = () => {
+    state.screen = "practice";
+    renderQuestion();
+  }
+
+  function renderConceptSlide() {
+    if (!CONCEPT_SLIDES || !CONCEPT_SLIDES.length) return;
+    updateStatus();
+    const idx = state.conceptIndex;
+    if (idx < 0 || idx >= CONCEPT_SLIDES.length) state.conceptIndex = 0;
+
+    const data = CONCEPT_SLIDES[state.conceptIndex];
+
+    let contentHtml = "";
+    if (data.type === "summary") {
+      const btnAction = state.returnToPractice ? `returnToQuestion()` : `showBridge('concept_end')`;
+      const btnText = state.returnToPractice ? `문제로 돌아가기 ↩` : `문제 풀러 가기! 🚀`;
+      contentHtml = `
+        <div class="flex flex-col items-center justify-center min-h-[350px] text-center slide-in">
+          <div class="text-6xl mb-4">${data.icon}</div>
+          <div class="text-2xl md:text-3xl font-black text-[var(--indigo)] mb-4">${data.title}</div>
+          <div class="text-xl md:text-2xl font-bold leading-relaxed mb-8 bg-white p-6 rounded-2xl border-4 border-[var(--indigo)] shadow-lg">
+            ${data.desc}
+          </div>
+          <button class="retro-btn btn-primary text-xl w-full max-w-sm py-4 shadow-lg animate-pulse" onclick="${btnAction}">${btnText}</button>
+        </div>`;
+    } else if (data.type === "how_to") {
+      contentHtml = `
+        <div class="flex flex-col items-center justify-center min-h-[230px] text-center slide-in w-full">
+          <div class="text-2xl md:text-3xl font-black mb-2">${data.title}</div>
+          <div class="text-base md:text-lg text-gray-600 mb-6 font-bold">${data.desc}</div>
+          <div class="space-y-3 w-full max-w-md">
+            ${data.pairs.map(p => `<div class="retro-box soft p-3" style="display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;"><span class="text-right font-black text-lg md:text-xl muted">${p.from}</span><span class="text-[var(--orange)] text-xl font-black">➡</span><span class="text-left font-black text-lg md:text-xl text-[var(--indigo)]">${p.to}</span></div>`).join('')}
+          </div>
+        </div>`;
+    } else {
+      const examples = data.ex || [];
+      const rule = data.rule || "";
+      contentHtml = `
+        <div class="flex flex-col items-center justify-center min-h-[230px] text-center slide-in w-full">
+          <div class="text-5xl md:text-6xl mb-3">${data.icon}</div>
+          <div class="text-2xl md:text-3xl font-black text-[var(--indigo)] mb-3">${data.title}</div>
+          <div class="text-base md:text-lg font-bold leading-loose mb-4 bg-white p-4 md:p-5 rounded-xl border-2 border-dashed border-gray-300 w-full max-w-4xl mx-auto" style="line-height:2;">${data.desc}</div>
+          ${examples.length ? `<div class="w-full max-w-md retro-box soft p-3"><div class="kicker text-center mb-2">예시</div><div class="flex flex-col gap-1 font-semibold text-base text-left mx-auto" style="width:fit-content;">${examples.map(w => `<div>${w}</div>`).join('')}</div></div>` : ''}
+          ${rule ? `<div class="text-base md:text-lg font-bold text-gray-600 bg-yellow-100 p-2 rounded-lg mt-3">${rule}</div>` : ''}
+        </div>`;
+    }
+
+    screenEl.innerHTML = `
+      <div class="relative w-full">
+        ${state.returnToPractice ? `<div class="absolute top-4 right-4 z-30"><button class="retro-btn btn-primary text-sm py-2 px-4 shadow-lg" onclick="returnToQuestion()">↩ 문제로 돌아가기</button></div>` : ''}
+        <div class="absolute -top-3 -left-3 badge z-20"><span class="pop">2</span><span class="font-black">개념 쏙쏙 (${state.conceptIndex + 1}/${CONCEPT_SLIDES.length})</span></div>
+        <div class="retro-box p-6 min-h-[350px] flex flex-col relative bg-white">
+          <div class="confetti-layer show opacity-10 pointer-events-none"></div>
+          <div class="flex-1 relative z-10 flex flex-col justify-center">${contentHtml}</div>
+          <div class="mt-4 flex items-center justify-between z-20 relative">
+            <div class="w-24">${state.conceptIndex > 0 ? `<button class="retro-btn btn-ghost text-sm" onclick="navConcept(-1)">◀ 이전</button>` : `<button class="retro-btn btn-ghost text-sm" onclick="window.goHomeCheck()">🏠 홈</button>`}</div>
+            <div class="flex gap-2">${CONCEPT_SLIDES.map((_, i) => `<div class="w-3 h-3 rounded-full border-2 border-black transition-colors ${i === state.conceptIndex ? 'bg-[var(--indigo)]' : 'bg-gray-200'}"></div>`).join('')}</div>
+            <div class="w-24 text-right">${state.conceptIndex < CONCEPT_SLIDES.length - 1 ? `<button class="retro-btn btn-indigo text-sm" onclick="navConcept(1)">다음 ▶</button>` : `<div class="w-full"></div>`}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  window.navConcept = (dir) => {
+    if (!CONCEPT_SLIDES) return;
+    const newIdx = state.conceptIndex + dir;
+    if (newIdx >= 0 && newIdx < CONCEPT_SLIDES.length) { state.conceptIndex = newIdx; renderConceptSlide(); }
+  }
+
+  /* =========================================================================
+     단계 사이 안내 모달 (Bridge)
+     ========================================================================= */
+  const bridgeModal = document.getElementById("bridgeModal");
+  const brTitle = document.getElementById("bridgeTitle");
+  const brMsg = document.getElementById("bridgeMsg");
+  const brGuide = document.getElementById("bridgeGuidance");
+  const brGuideText = document.getElementById("bridgeGuidanceText");
+
+  window.showBridge = (mode) => {
+    state.bridge.count = state.plan.count;
+    state.bridge.minutes = state.plan.minutes;
+    updateBridgeUI();
+
+    brGuide.classList.add("hidden");
+    brGuideText.innerHTML = "";
+
+    if (mode === "concept_end") {
+      brTitle.textContent = "개념 완료! 🎉";
+      brMsg.textContent = "이제 실전 문제를 풀어볼까요?";
+      state.plan.range = "stage1";
+      brGuide.classList.remove("hidden");
+      brGuideText.innerHTML = "1단계는 <span class='text-[var(--indigo)]'>낱말의 종류</span>를 맞히는 단계예요.<br/>단어가 <b>이름, 움직임, 성질이나 상태</b> 중 어디에 속하는지 골라보세요!";
+    } else if (mode === "retry_good") {
+      brTitle.textContent = "실력이 쑥쑥! 👍";
+      brMsg.textContent = "더 높은 목표로 도전해 봐요!";
+    } else if (mode === "retry_bad") {
+      brTitle.textContent = "포기하지 마세요! ✨";
+      brMsg.textContent = "다시 한 번 천천히 해볼까요?";
+    } else if (mode === "next_level") {
+      brTitle.textContent = "레벨 업! 🌟";
+      brMsg.textContent = "정말 대단해요! 다음 단계도 멋지게 해낼 거예요!";
+      brGuide.classList.remove("hidden");
+      if (state.nextRange === "stage2") {
+        brGuideText.innerHTML = "2단계는 <span class='text-[var(--indigo)]'>기본 모습</span>을 찾는 단계예요.<br/>여러 가지로 모양이 바뀐 낱말들의 <b>기본형(-다)</b>을 찾아 적어보세요!";
+      } else if (state.nextRange === "stage3") {
+        brGuideText.innerHTML = "3단계는 <span class='text-[var(--indigo)]'>문장 속 낱말</span>을 찾는 단계예요.<br/>문장에서 바뀐 낱말을 찾아 <b>종류와 기본형</b>을 모두 맞춰야 해요!";
+      } else {
+        brGuideText.innerHTML = "종합 문제는 <b>모든 단계</b>가 섞여서 나와요.<br/>지금까지 배운 내용을 총동원해 보세요!";
+      }
+    } else if (mode === "mixed") {
+      brTitle.textContent = "🧩 종합 문제 도전!";
+      brMsg.textContent = "지금까지 배운 모든 것을 총동원해 봐요!";
+      brGuide.classList.remove("hidden");
+      brGuideText.innerHTML = "종합 문제는 <b>1·2·3단계가 섞여서</b> 출제돼요.<br/>모든 유형이 무작위로 나오니, 배운 내용을 떠올리며 차근차근 풀어보세요!";
+    } else { // direct
+      brTitle.textContent = "학습 시작! 🚀";
+      brMsg.textContent = "목표를 세우고 시작해 봐요!";
+      brGuide.classList.remove("hidden");
+      if (state.plan.range === 'stage1' || state.plan.range === 'step') {
+        brGuideText.innerHTML = "첫 시작은 1단계 <span class='text-[var(--indigo)]'>낱말의 종류</span> 맞히기예요.<br/>이름, 움직임, 성질이나 상태 중 어디에 속하는지 골라보세요!";
+        if (state.plan.range === 'step') state.plan.range = 'stage1';
+      } else if (state.plan.range === 'stage2') {
+        brGuideText.innerHTML = "2단계 <span class='text-[var(--indigo)]'>기본 모습</span> 찾기를 시작해요.<br/>모양이 바뀐 낱말들의 <b>기본형</b>을 찾아보세요!";
+      } else if (state.plan.range === 'stage3') {
+        brGuideText.innerHTML = "3단계 <span class='text-[var(--indigo)]'>문장 속 낱말</span> 찾기를 시작해요.<br/>문장 안에서 낱말의 종류와 기본형을 찾아보세요!";
+      }
+    }
+
+    bridgeModal.classList.add("open");
+
+    const layer = bridgeModal.querySelector(".confetti-layer");
+    layer.innerHTML = "";
+    const colors = ["#FFF", "#FFD700", "#FF69B4"];
+    for (let i = 0; i < 20; i++) {
+      const d = document.createElement("div"); d.className = "confetti";
+      d.style.left = Math.random() * 100 + "%"; d.style.top = -Math.random() * 20 + "px";
+      d.style.background = colors[i % 3]; d.style.animationDelay = Math.random() * .5 + "s";
+      layer.appendChild(d);
+    }
+  }
+
+  window.setBridgeCount = (n) => { state.bridge.count = n; updateBridgeUI(); }
+  window.setBridgeTime  = (n) => { state.bridge.minutes = n; updateBridgeUI(); }
+
+  window.startMixed = () => {
+    if (!isStage3Completed()) { showMixedLocked(); return; }
+    state.nextRange = "step";
+    showBridge('mixed');
+  };
+  window.showMixedLocked = () => { toast("🔒 3단계를 완료하면 도전할 수 있어요!"); };
+
+  function updateBridgeUI() {
+    [5, 10, 15, 20].forEach(n => document.getElementById(`brC${n}`).classList.toggle("selected", state.bridge.count === n));
+  }
+
+  document.getElementById("btnBridgeStart").onclick = () => {
+    if (state.nextRange) {
+      state.plan.range = state.nextRange;
+      state.nextRange = null;
+    } else if (state.plan.range === 'step') {
+      state.plan.range = 'stage1';
+    }
+    state.plan.count = state.bridge.count;
+    state.plan.minutes = state.bridge.minutes;
+    savePlan();
+    bridgeModal.classList.remove("open");
+    initPractice();
+  }
+
+  /* =========================================================================
+     문제 풀이
+     ========================================================================= */
+
+  function initPractice() {
+    state.originalSession = null;
+    state.retryMode = false;
+    buildQueue();
+    state.pointer = 0;
+    state.attempts = 0;
+    state.screen = "practice";
+    startTimer();
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    state.current = state.queue[state.pointer] != null ? state.queue[state.pointer] : null;
+    selType = null;
+
+    if (!state.current) { renderResult(); return; }
+    updateStatus();
+
+    const q = state.current;
+    const progress = Math.round(((state.pointer) / state.queue.length) * 100);
+
+    let content = "";
+    if (q.kind === "cat") {
+      content = `
+        <div class="text-2xl md:text-3xl font-black text-[var(--indigo)] text-center leading-tight mb-6 md:mb-7">
+          이 낱말은 어떤 <span class="bg-[var(--yellow)] px-2 rounded-lg">종류</span>일까요?
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+          <div class="flex items-center justify-center p-4 md:p-5 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl border-4 border-[var(--indigo)] shadow-lg min-h-[220px]">
+            <div class="relative">
+              <div class="text-6xl md:text-7xl font-black bg-[var(--yellow)] px-10 py-8 rounded-3xl border-5 border-black shadow-[8px_8px_0_#000] transform hover:scale-105 transition-transform">${q.word}</div>
+              <div class="absolute -bottom-3 -right-3 bg-orange-500 text-white text-sm font-black px-3 py-1 rounded-full border-2 border-black shadow-md">${q.word.includes('(') ? '' : '(기본형)'}</div>
+            </div>
+          </div>
+          <div class="flex flex-col gap-4">
+            ${[1, 2, 3].map(v => `
+              <button class="retro-btn btn-ghost text-xl md:text-2xl py-6 px-6 font-black hover:scale-105 transition-transform shadow-[6px_6px_0_#000] border-4" onclick="checkCat(${v})" data-lockable style="justify-content: flex-start; text-align: left;">
+                <span class="text-3xl mr-3">${v === 1 ? '🏷️' : v === 2 ? '💪' : '✨'}</span>
+                ${LABELS[v]}
+              </button>
+            `).join('')}
+          </div>
+        </div>`;
+    } else if (q.kind === "base") {
+      content = `
+        <div class="text-center space-y-6">
+          <div class="text-2xl md:text-3xl font-black text-[var(--indigo)]">공통된 기본형은 무엇일까요?</div>
+          <div class="text-2xl md:text-3xl font-black leading-snug break-keep bg-gray-50 p-6 rounded-2xl border-2 border-black">${q.forms}</div>
+          <div class="max-w-sm mx-auto">
+            <input id="inp" class="retro-input text-center text-2xl" placeholder="예: 보다" onkeydown="if(event.key==='Enter') checkBase()" data-lockable>
+          </div>
+          <button class="retro-btn btn-primary w-full max-w-sm py-3 text-lg" onclick="checkBase()" data-lockable>제출하기</button>
+        </div>`;
+    } else { // sent
+      const sentHtml = q.s.replace(q.target, `<span class="bg-[var(--yellow)] px-1 border-b-2 border-[var(--orange)]">${q.target}</span>`);
+      content = `
+        <div class="space-y-4">
+          <div class="flex flex-nowrap items-center gap-x-4 p-4 md:p-5 border-2 border-black rounded-2xl bg-white overflow-hidden">
+            <span class="flex-shrink-0 inline-flex items-center gap-1 text-base md:text-lg font-black text-white bg-[var(--indigo)] px-3 py-1.5 rounded-xl border-2 border-black whitespace-nowrap">🔎 문장 속 낱말 찾기</span>
+            <span class="flex-1 min-w-0 font-black leading-snug text-center whitespace-nowrap overflow-hidden text-ellipsis" style="font-size:clamp(18px, 2.4vw, 30px);">${sentHtml}</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-6 items-stretch">
+            <div id="stepBox1" class="retro-box soft p-5 md:p-6 step-active md:col-span-3 flex flex-col">
+              <div class="font-black mb-4 text-lg md:text-xl flex items-center gap-2 flex-wrap">
+                <span>1️⃣ 낱말의 종류 선택하기</span>
+                <span class="step-badge">👉 먼저!</span>
+              </div>
+              <div class="flex flex-col gap-3 flex-1 justify-center">${[1, 2, 3].map(v => `<button id="btnT${v}" class="retro-btn btn-ghost text-base md:text-lg py-4 px-5 w-full whitespace-nowrap" onclick="selectType(${v})" data-lockable style="justify-content: flex-start; text-align: left;">${LABELS[v]}</button>`).join('')}</div>
+            </div>
+            <div id="stepBox2" class="retro-box soft p-5 md:p-6 md:col-span-2 flex flex-col">
+              <div class="font-black mb-3 text-lg md:text-xl flex items-center gap-2 flex-wrap">
+                <span>2️⃣ 낱말의 기본형 쓰기</span>
+                <span class="step-badge">👉 다음!</span>
+              </div>
+              <div class="text-sm md:text-base font-black text-[var(--orange)] bg-orange-50 border-2 border-orange-200 rounded-xl py-2 px-3 mb-3 text-center break-keep">
+                💡 종류 선택 → 기본형 쓰기
+              </div>
+              <div class="flex-1 flex flex-col justify-center gap-3">
+                <input id="inp" class="retro-input text-center text-2xl py-4" placeholder="예: 보다" onkeydown="if(event.key==='Enter') checkSent()" data-lockable>
+                <button class="retro-btn btn-primary w-full py-4 text-lg" onclick="checkSent()" data-lockable>제출</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    screenEl.innerHTML = `
+      <div class="max-w-5xl mx-auto relative">
+        <div id="qCard" class="retro-box p-5 md:p-7 relative z-10 bg-white">
+          <div class="confetti-layer" id="confettiLayer"></div>
+          <div class="flex items-center gap-2 md:gap-3 mb-5 flex-wrap">
+            <div class="badge whitespace-nowrap"><span class="pop">문제</span><span class="font-black">${state.pointer + 1}</span></div>
+            <div class="flex-1 flex items-center gap-2 min-w-[140px]">
+              <div class="relative flex-1 h-5 bg-gray-200 rounded-full border-2 border-black overflow-hidden shadow-[3px_3px_0_#000]">
+                <div class="absolute inset-0 bg-gradient-to-r from-[var(--indigo)] to-[var(--orange)] transition-all duration-500 ease-out" style="width:${progress}%;"></div>
+              </div>
+              <div class="text-sm md:text-base font-black text-[var(--indigo)] whitespace-nowrap">${state.pointer + 1} / ${state.queue.length}</div>
+            </div>
+            <button class="retro-btn btn-ghost text-xs py-2 px-3 whitespace-nowrap" onclick="initConcept(true)">📖 개념 다시</button>
+          </div>
+          ${content}
+          <div id="feedback" class="mt-5 text-center font-bold muted min-h-[1.5em] text-xl transition-colors"></div>
+        </div>
+      </div>`;
+
+    state.lockUntil = Date.now() + LOCK_MS;
+    updateLockUI(true);
+
+    const tmr = setInterval(() => {
+      if (state.screen !== "practice") { clearInterval(tmr); return; }
+      const left = Math.ceil((state.lockUntil - Date.now()) / 1000);
+      const fb = document.getElementById("feedback");
+      if (left > 0) {
+        if (fb) { fb.innerHTML = `⏳ <span class="text-[var(--orange)]">${left}초</span> 동안 천천히 읽어보세요.`; fb.classList.add("animate-pulse"); }
+      } else {
+        if (fb) { fb.textContent = ""; fb.classList.remove("animate-pulse"); }
+        updateLockUI(false);
+        const inp = document.getElementById("inp"); if (inp) inp.focus();
+        clearInterval(tmr);
+      }
+    }, TICK_MS);
+  }
+
+  function updateLockUI(locked) {
+    screenEl.querySelectorAll("[data-lockable]").forEach(el => {
+      el.disabled = locked;
+      el.classList.toggle("btn-disabled", locked);
+    });
+  }
+
+  let selType = null;
+  window.selectType = (v) => {
+    selType = v;
+    [1, 2, 3].forEach(i => {
+      const btn = document.getElementById(`btnT${i}`);
+      if (btn) {
+        btn.className = `retro-btn ${i === v ? 'btn-indigo' : 'btn-ghost'} text-base md:text-lg py-4 px-5 w-full whitespace-nowrap`;
+        btn.style.justifyContent = 'flex-start';
+        btn.style.textAlign = 'left';
+      }
+    });
+    const box1 = document.getElementById("stepBox1");
+    const box2 = document.getElementById("stepBox2");
+    if (box1) box1.classList.remove("step-active");
+    if (box2) box2.classList.add("step-active");
+    const inp = document.getElementById("inp");
+    if (inp && !inp.disabled) inp.focus();
+  }
+
+  window.checkCat = (ans) => {
+    if (ans === state.current.a) correct();
+    else wrong(state.current.word, LABELS[state.current.a], "종류를 다시 생각해 봐요.");
+  }
+  window.checkBase = () => {
+    const v = normalizeText(document.getElementById("inp").value);
+    if (!v) { toast("답을 입력해주세요!"); return; }
+    const ans = normalizeText(state.current.base);
+    if (v === ans || (ans.includes("쓰다") && v === "쓰다")) correct();
+    else wrong(state.current.forms, state.current.base, "사전에는 '-다'가 붙은 모습으로 나와요.");
+  }
+  window.checkSent = () => {
+    if (!selType) { toast("1번(종류)을 먼저 골라주세요!"); return; }
+    const v = normalizeText(document.getElementById("inp").value);
+    if (!v) { toast("2번(기본 모습)을 써주세요!"); return; }
+    const q = state.current;
+    const okType = selType === q.type;
+    const okBase = v === normalizeText(q.base) || (q.base.includes("쓰다") && v === "쓰다");
+    if (okType && okBase) { correct(); return; }
+
+    let customFb = "";
+    if (!okType && !okBase) {
+      const parts = [];
+      if (q.fbNoType) parts.push(q.fbNoType);
+      if (q.fbNoBase) parts.push(q.fbNoBase);
+      customFb = parts.join("<br><br>");
+    } else if (!okType) {
+      customFb = q.fbNoType || "";
+    } else {
+      customFb = q.fbNoBase || "";
+    }
+    wrong(q.target, `${LABELS[q.type]} / ${q.base}`, "종류나 기본 모습이 틀렸어요.", customFb);
+  }
+
+  /* =========================================================================
+     피드백 모달 + 정답/오답 처리
+     ========================================================================= */
+
+  function showFeedbackModal(isCorrect, fbMsg, hintMsg, ans) {
+    const modal = document.getElementById("fbModal");
+    const header = document.getElementById("fbHeader");
+    const icon = document.getElementById("fbIcon");
+    const msg = document.getElementById("fbMessage");
+    const detail = document.getElementById("fbDetail");
+    const hint = document.getElementById("fbHint");
+    const btn = document.getElementById("btnFbNext");
+
+    if (isCorrect) {
+      header.className = "p-4 border-b-4 border-black text-xl font-black text-white bg-[var(--indigo)]";
+      header.textContent = "정답입니다! 🎉";
+      icon.textContent = "🥳";
+      msg.innerHTML = `<span class="text-[var(--indigo)]">참 잘했어요!</span>`;
+      if (fbMsg) { detail.classList.remove("hidden"); detail.innerHTML = fbMsg; }
+      else { detail.classList.add("hidden"); }
+      hint.classList.add("hidden");
+      btn.className = "retro-btn btn-indigo w-full mt-6 py-4 text-xl shadow-lg animate-pulse";
+      btn.textContent = "다음 문제로 🚀";
+      btn.onclick = () => {
+        modal.classList.remove("open");
+        state.pointer++; state.attempts = 0; renderQuestion(); updateStatus();
+      };
+      celebrate();
+    } else {
+      header.className = "p-4 border-b-4 border-black text-xl font-black text-white bg-[var(--orange)]";
+      header.textContent = "앗! 다시 생각해볼까요?";
+      icon.textContent = "🤔";
+      msg.innerHTML = `<span class="text-[var(--orange)]">조금 더 생각해 봐요!</span>`;
+      if (fbMsg) { detail.classList.remove("hidden"); detail.innerHTML = fbMsg; }
+      else { detail.classList.add("hidden"); }
+
+      let finalHintHTML = "";
+      if (hintMsg) finalHintHTML += `💡 <b>힌트:</b> ${hintMsg}`;
+
+      if (state.attempts >= 3) {
+        if (finalHintHTML) finalHintHTML += "<br><br>";
+        finalHintHTML += `<span class="text-red-600 inline-block px-2 py-1 bg-red-100 rounded border border-red-200 shadow-sm"><b>정답: ${ans}</b></span>`;
+        btn.textContent = "다음 문제로 (넘어가기) ⏭️";
+        btn.className = "retro-btn btn-ghost w-full mt-6 py-4 text-xl shadow-lg";
+        btn.onclick = () => {
+          modal.classList.remove("open");
+          state.pointer++; state.attempts = 0; renderQuestion(); updateStatus();
+        };
+      } else {
+        btn.className = "retro-btn btn-primary w-full mt-6 py-4 text-xl shadow-lg";
+        btn.textContent = "다시 풀기 🔄";
+        btn.onclick = () => { modal.classList.remove("open"); };
+      }
+      if (finalHintHTML) { hint.classList.remove("hidden"); hint.innerHTML = finalHintHTML; }
+      else { hint.classList.add("hidden"); }
+    }
+    modal.dataset.openedAt = String(Date.now());
+    modal.classList.add("open");
+    setTimeout(() => {
+      const b = document.getElementById("btnFbNext");
+      if (b && modal.classList.contains("open")) {
+        try { b.focus({ preventScroll: true }); } catch (e) { try { b.focus(); } catch (e2) { } }
+      }
+    }, 200);
+  }
+
+  /**
+   * 시트의 피드백 텍스트를 HTML로 변환.
+   *  **굵게** → <strong class="fb-strong">
+   *  \n → <br>
+   */
+  function formatFeedback(text) {
+    if (!text) return "";
+    return String(text)
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="fb-strong">$1</strong>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function correct() {
+    state.stats.correct++;
+    const q = state.current;
+    const k = q.kind;
+    if      (k === "cat")  { state.stats.stage1.c++; state.stats.stage1.t++; }
+    else if (k === "base") { state.stats.stage2.c++; state.stats.stage2.t++; }
+    else if (k === "sent") { state.stats.stage3.c++; state.stats.stage3.t++; }
+
+    const t = getQuestionType(q);
+    if (t && state.attempts === 0) {
+      state.stats.byType[t].c++;
+      state.stats.byType[t].t++;
+    }
+    if (state.attempts === 0) {
+      state.stats.correctItems.push({
+        kind: k, label: getQuestionLabel(q), answer: getQuestionAnswer(q), type: t
+      });
+    }
+    const fbMsg = formatFeedback(q.fbOk);
+    showFeedbackModal(true, fbMsg, null, null);
+    saveProgressIfDemo();
+  }
+
+  function wrong(p, ans, fallbackHint, customFbMsg) {
+    const q = state.current;
+    const isFirstAttempt = state.attempts === 0;
+    state.attempts++;
+    state.stats.wrong++;
+
+    if (isFirstAttempt) {
+      if      (q.kind === "cat")  state.stats.stage1.t++;
+      else if (q.kind === "base") state.stats.stage2.t++;
+      else if (q.kind === "sent") state.stats.stage3.t++;
+      const t = getQuestionType(q);
+      if (t) state.stats.byType[t].t++;
+      state.stats.wrongQuestions.push(JSON.parse(JSON.stringify(q)));
+    }
+    const baseFb = (customFbMsg !== undefined && customFbMsg !== null) ? customFbMsg : (q.fbNo || "");
+    const fbMsg   = formatFeedback(baseFb);
+    const hintMsg = formatFeedback(q.hint || fallbackHint || "");
+
+    state.stats.wrongItems.push({ prompt: p, correct: ans, tip: hintMsg });
+
+    showFeedbackModal(false, fbMsg, hintMsg, ans);
+    const card = document.getElementById("qCard");
+    if (card) { card.classList.remove("shake"); void card.offsetWidth; card.classList.add("shake"); }
+    saveProgressIfDemo();
+  }
+
+  function celebrate() {
+    const l = document.getElementById("confettiLayer");
+    if (!l) return;
+    l.innerHTML = ""; l.classList.add("show");
+    const colors = ["#FDE047", "#F97316", "#6366F1", "#A7F3D0"];
+    for (let i = 0; i < 20; i++) {
+      const d = document.createElement("div"); d.className = "confetti";
+      d.style.left = Math.random() * 100 + "%"; d.style.top = -Math.random() * 20 + "px";
+      d.style.background = colors[i % 4]; d.style.animationDelay = Math.random() * .5 + "s";
+      l.appendChild(d);
+    }
+    setTimeout(() => l.classList.remove("show"), 1000);
+  }
+
+  /* =========================================================================
+     결과 보고서
+     ========================================================================= */
+
+  function renderResult() {
+    state.screen = "result"; updateStatus(); stopTimer();
+
+    if (!state.originalSession) {
+      state.originalSession = JSON.parse(JSON.stringify(state.stats));
+    }
+    if (state.plan.range === "stage3" && state.originalSession.total > 0) {
+      markStage3Completed();
+    }
+
+    const orig = state.originalSession;
+    const cur  = state.stats;
+    const canDownload = cur.total > 0 && cur.wrong === 0;
+    const needsRetry  = cur.wrongQuestions.length > 0;
+
+    const totalQ   = orig.total;
+    const correctQ = totalQ - orig.wrongQuestions.length;
+    const score    = totalQ ? Math.round((correctQ / totalQ) * 100) : 0;
+
+    let headerMsg, subMsg;
+    if (state.retryMode) {
+      headerMsg = canDownload ? "📓 다시 풀이 완료! 멋져요!" : "조금만 더 힘내요! 💪";
+      subMsg    = canDownload
+        ? "직전에 틀렸던 문제도 이제 모두 맞췄어요!"
+        : `이번엔 ${cur.wrongQuestions.length}개를 더 맞춰봐요!`;
+    } else {
+      headerMsg = canDownload ? "참 잘했어요! 🎉" : "수고했어요! 💪";
+      subMsg    = canDownload ? "한 번에 모두 맞췄어요!" : "";
+    }
+
+    let nextR = "", nextLabel = "";
+    if      (state.plan.range === "stage1") { nextR = "stage2"; nextLabel = "2단계 도전! 🚀"; }
+    else if (state.plan.range === "stage2") { nextR = "stage3"; nextLabel = "3단계 도전! 🏆"; }
+    else if (state.plan.range === "stage3") { nextR = "step";   nextLabel = "종합 문제 도전! 🧩"; }
+
+    const typeRowsHtml = [1, 2, 3].map(t => {
+      const d = orig.byType[t];
+      if (!d.t) {
+        return `
+          <div class="flex items-center gap-3 py-1">
+            <div class="font-black w-32 md:w-36 flex-shrink-0 text-base md:text-lg">${TYPE_META[t].icon} ${TYPE_META[t].name}</div>
+            <div class="flex-1 text-sm text-gray-400 italic">이번 학습에 출제 안 됨</div>
+          </div>`;
+      }
+      const pct = Math.round((d.c / d.t) * 100);
+      return `
+        <div class="flex items-center gap-3 py-1">
+          <div class="font-black w-32 md:w-36 flex-shrink-0 text-base md:text-lg">${TYPE_META[t].icon} ${TYPE_META[t].name}</div>
+          <div class="type-bar-outer"><div class="type-bar-inner" style="width:${pct}%"></div></div>
+          <div class="font-black w-24 md:w-28 text-right text-base md:text-lg whitespace-nowrap">${d.c}/${d.t} (${pct}%)</div>
+        </div>`;
+    }).join('');
+
+    const correctListHtml = orig.correctItems.length === 0
+      ? `<div class="text-sm text-gray-500 py-3 text-center">한 번에 맞춘 낱말이 아직 없어요</div>`
+      : `<div class="space-y-1 max-h-72 overflow-y-auto pr-1">
+           ${orig.correctItems.map(it => `
+             <div class="text-sm md:text-base border-b border-gray-200 py-1 flex items-baseline gap-2 break-keep">
+               <span class="font-black text-[var(--indigo)]">✓</span>
+               <span class="font-black flex-1">${it.label}</span>
+               ${it.type ? `<span class="text-xs text-gray-500 whitespace-nowrap">(${TYPE_META[it.type].name})</span>` : ""}
+             </div>`).join('')}
+         </div>`;
+
+    const wrongListHtml = orig.wrongQuestions.length === 0
+      ? `<div class="text-sm text-gray-500 py-3 text-center">완벽해요! 틀린 낱말이 없어요 👍</div>`
+      : `<div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+           ${orig.wrongQuestions.map(q => {
+             const label = getQuestionLabel(q);
+             const ans   = getQuestionAnswer(q);
+             const t     = getQuestionType(q);
+             return `
+               <div class="border-b border-gray-200 py-1 break-keep">
+                 <div class="font-black text-sm md:text-base flex items-baseline gap-2">
+                   <span class="text-[var(--orange)]">✗</span>
+                   <span class="flex-1">${label}</span>
+                   ${t ? `<span class="text-xs text-gray-500 whitespace-nowrap">(${TYPE_META[t].name})</span>` : ""}
+                 </div>
+                 <div class="text-xs md:text-sm text-[var(--indigo)] font-bold pl-5">정답: ${ans}</div>
+               </div>`;
+           }).join('')}
+         </div>`;
+
+    const stu = window.__currentStudent || {};
+    const studentTag = (stu.num || stu.name)
+      ? `<div class="text-center text-sm md:text-base font-bold text-gray-600 mb-2">👤 ${stu.num ? stu.num + '번 ' : ''}${stu.name || ''}</div>`
+      : '';
+
+    screenEl.innerHTML = `
+      <div id="resultConfetti" class="result-confetti-layer"></div>
+
+      <div id="reportPanel" class="retro-box p-6 md:p-8">
+        <div class="kicker mb-2 text-center">RESULT · ${state.retryMode ? "RETRY" : "FIRST"} SESSION</div>
+        ${studentTag}
+        <h2 class="text-3xl md:text-4xl font-black mb-2 text-center">${headerMsg}</h2>
+        ${subMsg ? `<div class="text-center text-base md:text-lg font-black text-[var(--indigo)] mb-4">${subMsg}</div>` : `<div class="mb-4"></div>`}
+
+        <div class="flex justify-center gap-3 mb-6 flex-wrap">
+          <div class="badge text-base md:text-xl px-4 py-2 bg-white"><span class="pop">⭕ 정답</span>${correctQ}/${totalQ}</div>
+          <div class="badge text-base md:text-xl px-4 py-2 bg-white"><span class="pop">🎯 정답률</span>${score}%</div>
+          ${orig.wrong > 0 ? `<div class="badge text-base md:text-xl px-4 py-2 bg-white"><span class="pop">🔁 다시 푼 횟수</span>${orig.wrong}번</div>` : ""}
+        </div>
+
+        <div class="retro-box soft p-4 md:p-5 mb-5">
+          <div class="font-black text-lg md:text-xl mb-3 border-b-2 border-black pb-2">📊 낱말 종류별 성취도</div>
+          <div class="space-y-1">${typeRowsHtml}</div>
+          <div class="text-xs md:text-sm text-gray-500 mt-2">※ '낱말의 종류 분류'(1단계)와 '문장 속 낱말 찾기'(3단계) 문제 기준</div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="retro-box soft p-4">
+            <div class="font-black text-base md:text-lg mb-2 border-b-2 border-black pb-1 text-[var(--indigo)]">
+              ⭕ 한 번에 맞춘 낱말 (${orig.correctItems.length}개)
+            </div>
+            ${correctListHtml}
+          </div>
+          <div class="retro-box soft p-4">
+            <div class="font-black text-base md:text-lg mb-2 border-b-2 border-black pb-1 text-[var(--orange)]">
+              ❌ 틀렸던 낱말 (${orig.wrongQuestions.length}개)
+            </div>
+            ${wrongListHtml}
+          </div>
+        </div>
+
+        <div class="retro-box p-4 md:p-5 mb-2 bg-yellow-50 border-4" style="border-color: var(--orange);">
+          <div class="font-black text-lg md:text-xl mb-3 text-[var(--orange)]">📓 공책에 정리해 봐요!</div>
+          <div class="space-y-2 text-base md:text-lg font-semibold leading-relaxed break-keep">
+            <div><span class="font-black text-[var(--indigo)]">①</span> 가장 어려웠던 낱말의 종류는 무엇인가요? <span class="text-sm text-gray-500">(이름 / 움직임 / 성질·상태)</span></div>
+            <div><span class="font-black text-[var(--indigo)]">②</span> 틀렸던 낱말 ${orig.wrongQuestions.length}개를 공책에 적고, 옆에 <strong class="fb-strong">기본형(-다)</strong> 도 함께 적어보세요.</div>
+            <div><span class="font-black text-[var(--indigo)]">③</span> 같은 종류의 낱말 <strong class="fb-strong">3개</strong> 를 직접 떠올려 적어보세요.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-2 justify-center flex-wrap mt-6">
+        <button class="retro-btn btn-secondary py-3 px-5" onclick="renderHome()">🏠 처음으로</button>
+        ${needsRetry
+          ? `<button class="retro-btn btn-primary py-3 px-5 animate-pulse text-base md:text-lg" onclick="startRetryWrong()">❌ 틀린 문제 다시 풀기 (${cur.wrongQuestions.length}개)</button>`
+          : ""}
+        <button id="btnDownloadReport"
+                class="retro-btn ${canDownload ? 'btn-indigo animate-pulse' : 'btn-locked'} py-3 px-5 text-base md:text-lg"
+                ${canDownload ? 'onclick="downloadReport()"' : 'onclick="showRetryRequired()"'}>
+          ${canDownload ? '📥 보고서 저장하기' : '🔒 보고서 저장 (다시 풀기 후 가능)'}
+        </button>
+        ${nextR && canDownload
+          ? `<button class="retro-btn btn-indigo py-3 px-5 text-base md:text-lg" onclick="goNextLevel('${nextR}')">${nextLabel}</button>`
+          : ""}
+      </div>
+      ${needsRetry ? `
+        <div class="text-center text-sm md:text-base font-bold text-[var(--orange)] mt-4 break-keep">
+          💡 보고서를 받으려면 틀린 문제 ${cur.wrongQuestions.length}개를 다시 풀어 모두 맞춰야 해요!
+        </div>` : ""}
+    `;
+
+    if (canDownload) setTimeout(() => triggerFireworks(), 150);
+
+    // 결과까지 도달했으면 체험 모드의 임시 진행 데이터는 정리한다
+    clearDemoProgress();
+  }
+
+  /** 화면 가운데에서 사방으로 터지는 폭죽 효과 (꽃가루) */
+  window.triggerFireworks = () => {
+    const layer = document.getElementById("resultConfetti");
+    if (!layer) return;
+    layer.innerHTML = "";
+    layer.classList.add("show");
+
+    const colors = ["#FDE047", "#F97316", "#6366F1", "#A7F3D0", "#FCA5A5", "#C4B5FD", "#FB923C", "#FFFFFF", "#34D399"];
+    const maxWaves = 4;
+    let waves = 0;
+    const fireOne = () => {
+      const cx = window.innerWidth  / 2 + (Math.random() - 0.5) * window.innerWidth  * 0.4;
+      const cy = window.innerHeight / 2 + (Math.random() - 0.5) * 200;
+      const N = 50;
+      for (let i = 0; i < N; i++) {
+        const piece = document.createElement("div");
+        piece.className = "firework-piece";
+        piece.style.left = cx + "px";
+        piece.style.top  = cy + "px";
+        const angle = (i / N) * Math.PI * 2 + Math.random() * 0.4;
+        const dist  = 200 + Math.random() * 320;
+        piece.style.setProperty('--tx', Math.cos(angle) * dist + "px");
+        piece.style.setProperty('--ty', Math.sin(angle) * dist + "px");
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDuration = (1.5 + Math.random() * 0.6) + "s";
+        piece.style.animationDelay = Math.random() * 0.15 + "s";
+        layer.appendChild(piece);
+      }
+      waves++;
+      if (waves < maxWaves) setTimeout(fireOne, 550);
+    };
+    fireOne();
+    setTimeout(() => { layer.classList.remove("show"); layer.innerHTML = ""; }, 5500);
+  };
+
+  /** 오답 재도전 (직전에 틀린 문제만 다시 풀기) */
+  window.startRetryWrong = () => {
+    if (!state.originalSession) {
+      state.originalSession = JSON.parse(JSON.stringify(state.stats));
+    }
+    const wrongQs = (state.stats.wrongQuestions || []).map(q => JSON.parse(JSON.stringify(q)));
+    if (wrongQs.length === 0) { toast("틀린 문제가 없어요!"); return; }
+
+    state.queue = shuffle(wrongQs);
+    state.pointer = 0;
+    state.attempts = 0;
+    state.retryMode = true;
+    state.stats = createInitialStats(state.queue.length);
+    state.screen = "practice";
+    startTimer();
+    renderQuestion();
+    toast("이번엔 꼭 맞춰봐요! 💪");
+  };
+
+  window.showRetryRequired = () => {
+    toast("틀린 문제를 다시 풀어 모두 맞춰야 보고서를 받을 수 있어요!");
+  };
+
+  window.goNextLevel = (nr) => {
+    state.nextRange = nr;
+    showBridge('next_level');
+  }
+
+  /* =========================================================================
+     큐 / 타이머 / 학습 계획 저장
+     ========================================================================= */
+
+  function shuffle(array) {
+    const arr = array.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  function buildQueue() {
+    const { count, range } = state.plan;
+    const s1 = STAGE1.slice();
+    const s2 = STAGE2A.slice();
+    const s3 = STAGE3.slice();
+    let q = [];
+
+    if (range === "stage1") {
+      q = shuffle(s1).slice(0, count).map(x => Object.assign({}, x, { kind: "cat" }));
+    } else if (range === "stage2") {
+      q = shuffle(s2).slice(0, count).map(x => Object.assign({}, x, { kind: "base" }));
+    } else if (range === "stage3") {
+      q = shuffle(s3).slice(0, count).map(x => Object.assign({}, x, { kind: "sent" }));
+    } else {
+      const n1 = Math.floor(count * 0.34);
+      const n2 = Math.floor(count * 0.33);
+      const n3 = count - n1 - n2;
+      const set1 = shuffle(s1).slice(0, n1).map(x => Object.assign({}, x, { kind: "cat" }));
+      const set2 = shuffle(s2).slice(0, n2).map(x => Object.assign({}, x, { kind: "base" }));
+      const set3 = shuffle(s3).slice(0, n3).map(x => Object.assign({}, x, { kind: "sent" }));
+      q = shuffle(set1.concat(set2, set3));
+    }
+    state.queue = q;
+    state.stats = createInitialStats(q.length);
+  }
+
+  function startTimer() {
+    if (!state.plan.minutes) return;
+    state.timer = { enabled: true, endAt: Date.now() + state.plan.minutes * 60000, expired: false };
+    state.timer.interval = setInterval(() => {
+      const left = state.timer.endAt - Date.now();
+      if (left <= 0) {
+        clearInterval(state.timer.interval);
+        document.getElementById("timerText").textContent = "00:00";
+        document.getElementById("timeModal").classList.add("open");
+      } else {
+        const m = Math.floor(left / 60000);
+        const s = Math.floor((left % 60000) / 1000);
+        document.getElementById("timerText").textContent =
+          `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+      }
+    }, 1000);
+  }
+  function stopTimer() { clearInterval(state.timer.interval); state.timer.enabled = false; }
+
+  function savePlan() {
+    try { localStorage.setItem("dict_app_plan_v1", JSON.stringify({ plan: state.plan })); } catch (e) { }
+  }
+
+  /* =========================================================================
+     체험 모드 진행 데이터 자동 저장 / 재개
+     ========================================================================= */
+  function _progressKey() {
+    const stu = window.__currentStudent || {};
+    if (!stu.num) return null;
+    return `progress:dict_word_app:${stu.num}`;
+  }
+  function saveProgressIfDemo() {
+    if (window.__APP_MODE !== "demo") return;
+    const key = _progressKey();
+    if (!key) return;
+    try {
+      const snap = {
+        plan: state.plan,
+        queue: state.queue,
+        pointer: state.pointer,
+        stats: state.stats,
+        screen: state.screen,
+        retryMode: state.retryMode,
+        originalSession: state.originalSession,
+        savedAt: Date.now()
+      };
+      localStorage.setItem(key, JSON.stringify(snap));
+    } catch (e) { /* 저장 실패는 조용히 무시 */ }
+  }
+  function clearDemoProgress() {
+    const key = _progressKey();
+    if (!key) return;
+    try { localStorage.removeItem(key); } catch (e) { }
+  }
+  function loadDemoProgress() {
+    const key = _progressKey();
+    if (!key) return null;
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (e) { return null; }
+  }
+
+  /* =========================================================================
+     결과 보고서 PNG 저장 — 외부 라이브러리 없이 직접 캔버스에 그린다
+       · state.originalSession + window.__currentStudent 데이터를 바탕으로
+         학습 보고서를 새 캔버스에 한 번에 그려내고 PNG 로 내려받는다.
+       · DOM 스크린샷 대신 자체 그리기를 사용해 폰트 끊김 / 외부 의존성 없이
+         안정적으로 동일한 그림을 만든다.
+     ========================================================================= */
+
+  window.downloadReport = function() {
+    const orig = state.originalSession || state.stats;
+    if (!orig || !orig.total) {
+      toast("저장할 학습 결과가 없어요.");
+      return;
+    }
+
+    const btn = document.getElementById("btnDownloadReport");
+    const originalHTML = btn ? btn.innerHTML : "";
+    if (btn) { btn.innerHTML = "📷 저장 중..."; btn.classList.add("btn-disabled"); }
+
+    // 한글이 또렷하게 그려지도록 폰트 로드를 기다린다 (실패해도 시스템 폰트로 진행)
+    const ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+
+    ready.then(() => {
+      try {
+        const canvas = _paintReportCanvas(orig);
+        const stu = window.__currentStudent || {};
+        const num  = stu.num  ? `${stu.num}번_` : "";
+        const name = stu.name || "학생";
+        const d = new Date();
+        const ymd = d.getFullYear() + "-" +
+                    String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                    String(d.getDate()).padStart(2, "0");
+
+        const link = document.createElement("a");
+        link.download = `학습보고서_${num}${name}_${ymd}.png`;
+        link.href = canvas.toDataURL("image/png");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        toast("✅ 보고서가 저장되었어요!");
+      } catch (e) {
+        console.error("[downloadReport]", e);
+        toast("저장에 실패했어요. 잠시 후 다시 시도해 주세요.");
+      } finally {
+        if (btn) { btn.innerHTML = originalHTML; btn.classList.remove("btn-disabled"); }
+      }
+    });
+  };
+
+  /**
+   * 학습 보고서를 캔버스에 직접 그린다.
+   * 반환: HTMLCanvasElement
+   */
+  function _paintReportCanvas(orig) {
+    const W = 1200;
+    const PADX = 60;
+    const SCALE = 2;             // 고해상도 출력
+    const FONT_KR = "'Noto Sans KR', system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif";
+
+    // ── 표시 데이터 준비 ──
+    const totalQ   = orig.total;
+    const correctQ = totalQ - orig.wrongQuestions.length;
+    const score    = totalQ ? Math.round((correctQ / totalQ) * 100) : 0;
+    const wrongCnt = orig.wrong || 0;
+
+    const stu = window.__currentStudent || {};
+    const studentLine = (stu.num || stu.name)
+      ? `👤 ${stu.num ? stu.num + '번 ' : ''}${stu.name || ''}` : "";
+
+    const today = new Date();
+    const ymd = `${today.getFullYear()}.${String(today.getMonth() + 1).padStart(2, "0")}.${String(today.getDate()).padStart(2, "0")}`;
+    const planLabel = state.plan.range === "stage1" ? "1단계 (낱말 종류)"
+                    : state.plan.range === "stage2" ? "2단계 (기본형 찾기)"
+                    : state.plan.range === "stage3" ? "3단계 (문장 속 기본형)"
+                    : "종합(혼합)";
+
+    // 한 번에 맞춘/틀린 낱말 라벨 추출
+    const correctLabels = (orig.correctItems || []).map(it => ({
+      label: it.label || "", typeName: it.type ? TYPE_META[it.type].name : ""
+    }));
+    const wrongLabels = (orig.wrongQuestions || []).map(q => ({
+      label: getQuestionLabel(q),
+      ans:   getQuestionAnswer(q),
+      typeName: getQuestionType(q) ? TYPE_META[getQuestionType(q)].name : ""
+    }));
+
+    // ── 높이 계산 (콘텐츠에 맞게 동적으로) ──
+    const ROW_H = 30;
+    const listColCount = Math.max(correctLabels.length, wrongLabels.length);
+    const listH = Math.max(100, 60 + listColCount * ROW_H);
+
+    let H = 0;
+    H += 90;                          // 상단 여백
+    H += 60;                          // 제목
+    if (studentLine) H += 36;         // 학생 정보
+    H += 30;                          // 날짜/범위
+    H += 50;                          // 헤더 메시지
+    H += 110;                         // 점수 카드(3개)
+    H += 40;                          // 섹션 제목 ('종류별 성취도')
+    H += 3 * 50 + 50;                 // 종류별 막대(3행) + 패딩
+    H += 40;                          // 섹션 제목 ('맞춘/틀린 낱말')
+    H += listH;
+    H += 50;                          // 섹션 제목 ('공책 정리')
+    H += 130;                         // 공책 정리 안내 3줄
+    H += 60;                          // 푸터
+    H += 40;                          // 하단 여백
+
+    // ── 캔버스 생성 (고해상도) ──
+    const canvas = document.createElement("canvas");
+    canvas.width  = W * SCALE;
+    canvas.height = H * SCALE;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(SCALE, SCALE);
+    ctx.textBaseline = "top";
+
+    // ── 배경 ──
+    ctx.fillStyle = "#FFF7ED";
+    ctx.fillRect(0, 0, W, H);
+
+    let y = 40;
+
+    // ── 헤더 박스 ──
+    _roundRect(ctx, PADX, y, W - PADX * 2, 80, 16);
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = "#000000"; ctx.stroke();
+
+    // 제목
+    ctx.fillStyle = "#000000";
+    ctx.font = `900 28px ${FONT_KR}`;
+    ctx.fillText("낱말의 종류와 기본형 — 학습 보고서", PADX + 24, y + 16);
+    // 범위/날짜
+    ctx.font = `700 14px ${FONT_KR}`;
+    ctx.fillStyle = "#6B7280";
+    ctx.fillText(`범위: ${planLabel}    |    날짜: ${ymd}`, PADX + 24, y + 50);
+    y += 100;
+
+    // ── 학생 정보 ──
+    if (studentLine) {
+      ctx.font = `800 18px ${FONT_KR}`;
+      ctx.fillStyle = "#4338CA";
+      ctx.fillText(studentLine, PADX + 4, y);
+      y += 30;
+    }
+
+    // ── 헤더 메시지 ──
+    ctx.font = `900 32px ${FONT_KR}`;
+    ctx.fillStyle = "#000000";
+    const headerMsg = (state.retryMode && wrongCnt === 0) ? "📓 다시 풀이 완료! 멋져요!"
+                    : (wrongCnt === 0 ? "참 잘했어요! 🎉" : "수고했어요! 💪");
+    ctx.fillText(headerMsg, PADX + 4, y);
+    y += 50;
+
+    // ── 점수 카드 3개 ──
+    const cardW = (W - PADX * 2 - 30) / 3;
+    const cardH = 90;
+    const cards = [
+      { label: "정답",      value: `${correctQ} / ${totalQ}`, color: "#6366F1" },
+      { label: "정답률",    value: `${score}%`,                color: score >= 90 ? "#047857" : score >= 70 ? "#6366F1" : "#F97316" },
+      { label: "다시 푼 횟수", value: `${wrongCnt} 번`,          color: wrongCnt === 0 ? "#047857" : "#F97316" }
+    ];
+    cards.forEach((c, i) => {
+      const cx = PADX + i * (cardW + 15);
+      _roundRect(ctx, cx, y, cardW, cardH, 14);
+      ctx.fillStyle = "#FFFFFF"; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = "#000"; ctx.stroke();
+      // 라벨
+      ctx.font = `800 14px ${FONT_KR}`;
+      ctx.fillStyle = "#6B7280";
+      ctx.fillText(c.label, cx + 18, y + 14);
+      // 값
+      ctx.font = `900 36px ${FONT_KR}`;
+      ctx.fillStyle = c.color;
+      ctx.fillText(c.value, cx + 18, y + 38);
+    });
+    y += cardH + 28;
+
+    // ── 섹션: 종류별 성취도 ──
+    _sectionTitle(ctx, "📊 낱말 종류별 성취도", PADX, y, W, FONT_KR);
+    y += 40;
+
+    const typeBlockW = W - PADX * 2;
+    _roundRect(ctx, PADX, y, typeBlockW, 3 * 50 + 30, 14);
+    ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = "#000"; ctx.stroke();
+    let ty = y + 18;
+
+    [1, 2, 3].forEach(t => {
+      const meta = TYPE_META[t];
+      const d = orig.byType[t];
+      const labelText = `${meta.icon} ${meta.name}`;
+
+      ctx.font = `900 18px ${FONT_KR}`;
+      ctx.fillStyle = "#000";
+      ctx.fillText(labelText, PADX + 24, ty + 6);
+
+      const barX = PADX + 24 + 180;
+      const barW = typeBlockW - 180 - 200 - 40;
+      const barY = ty + 14;
+      const barH = 18;
+      // 막대 배경
+      _roundRect(ctx, barX, barY, barW, barH, 9);
+      ctx.fillStyle = "#F1F5F9"; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = "#000"; ctx.stroke();
+
+      if (d && d.t > 0) {
+        const pct = Math.round((d.c / d.t) * 100);
+        const fillW = Math.max(0, Math.min(barW, (barW * pct) / 100));
+        // 그라데이션
+        const grad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+        grad.addColorStop(0, "#6366F1");
+        grad.addColorStop(1, "#F97316");
+        _roundRect(ctx, barX, barY, fillW, barH, 9, true);
+        ctx.fillStyle = grad; ctx.fill();
+
+        ctx.font = `900 16px ${FONT_KR}`;
+        ctx.fillStyle = "#000";
+        ctx.fillText(`${d.c}/${d.t} (${pct}%)`, barX + barW + 16, barY - 2);
+      } else {
+        ctx.font = `700 14px ${FONT_KR}`;
+        ctx.fillStyle = "#9CA3AF";
+        ctx.fillText("이번 학습에 출제 안 됨", barX + barW + 16, barY);
+      }
+      ty += 50;
+    });
+    y += 3 * 50 + 50;
+
+    // ── 섹션: 맞춘/틀린 낱말 (2단) ──
+    _sectionTitle(ctx, "⭕❌ 한 번에 맞춘 낱말 / ❌ 틀렸던 낱말", PADX, y, W, FONT_KR);
+    y += 40;
+
+    const colW = (W - PADX * 2 - 20) / 2;
+    _roundRect(ctx, PADX, y, colW, listH, 14);
+    ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = "#000"; ctx.stroke();
+
+    _roundRect(ctx, PADX + colW + 20, y, colW, listH, 14);
+    ctx.fillStyle = "#FFFFFF"; ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = "#000"; ctx.stroke();
+
+    // 좌측: 맞춘 낱말
+    ctx.font = `900 16px ${FONT_KR}`;
+    ctx.fillStyle = "#4338CA";
+    ctx.fillText(`⭕ 한 번에 맞춘 낱말 (${correctLabels.length}개)`, PADX + 18, y + 14);
+
+    ctx.font = `700 15px ${FONT_KR}`;
+    ctx.fillStyle = "#000";
+    if (correctLabels.length === 0) {
+      ctx.fillStyle = "#9CA3AF";
+      ctx.fillText("한 번에 맞춘 낱말이 아직 없어요", PADX + 18, y + 56);
+    } else {
+      correctLabels.slice(0, 14).forEach((it, i) => {
+        const ly = y + 50 + i * ROW_H;
+        ctx.fillStyle = "#4338CA";
+        ctx.font = `900 15px ${FONT_KR}`;
+        ctx.fillText("✓", PADX + 18, ly);
+        ctx.fillStyle = "#000";
+        ctx.font = `700 15px ${FONT_KR}`;
+        const label = it.label.length > 22 ? it.label.slice(0, 22) + "…" : it.label;
+        ctx.fillText(label, PADX + 42, ly);
+        if (it.typeName) {
+          ctx.fillStyle = "#6B7280";
+          ctx.font = `700 12px ${FONT_KR}`;
+          ctx.fillText(`(${it.typeName})`, PADX + colW - 80, ly + 2);
+        }
+      });
+      if (correctLabels.length > 14) {
+        ctx.fillStyle = "#9CA3AF";
+        ctx.font = `700 12px ${FONT_KR}`;
+        ctx.fillText(`외 ${correctLabels.length - 14}개 더…`, PADX + 18, y + listH - 24);
+      }
+    }
+
+    // 우측: 틀렸던 낱말
+    const rx = PADX + colW + 20;
+    ctx.font = `900 16px ${FONT_KR}`;
+    ctx.fillStyle = "#F97316";
+    ctx.fillText(`❌ 틀렸던 낱말 (${wrongLabels.length}개)`, rx + 18, y + 14);
+
+    if (wrongLabels.length === 0) {
+      ctx.fillStyle = "#9CA3AF";
+      ctx.font = `700 15px ${FONT_KR}`;
+      ctx.fillText("완벽해요! 틀린 낱말이 없어요 👍", rx + 18, y + 56);
+    } else {
+      wrongLabels.slice(0, 14).forEach((it, i) => {
+        const ly = y + 50 + i * ROW_H;
+        ctx.fillStyle = "#F97316";
+        ctx.font = `900 15px ${FONT_KR}`;
+        ctx.fillText("✗", rx + 18, ly);
+        ctx.fillStyle = "#000";
+        ctx.font = `700 15px ${FONT_KR}`;
+        const label = it.label.length > 18 ? it.label.slice(0, 18) + "…" : it.label;
+        ctx.fillText(label, rx + 42, ly);
+        // 정답
+        const ansShort = it.ans.length > 18 ? it.ans.slice(0, 18) + "…" : it.ans;
+        ctx.fillStyle = "#4338CA";
+        ctx.font = `700 12px ${FONT_KR}`;
+        ctx.fillText(`→ ${ansShort}`, rx + 42, ly + 16);
+      });
+      if (wrongLabels.length > 14) {
+        ctx.fillStyle = "#9CA3AF";
+        ctx.font = `700 12px ${FONT_KR}`;
+        ctx.fillText(`외 ${wrongLabels.length - 14}개 더…`, rx + 18, y + listH - 24);
+      }
+    }
+    y += listH + 30;
+
+    // ── 섹션: 공책 정리 ──
+    _sectionTitle(ctx, "📓 공책에 정리해 봐요!", PADX, y, W, FONT_KR);
+    y += 30;
+
+    _roundRect(ctx, PADX, y, W - PADX * 2, 130, 14);
+    ctx.fillStyle = "#FEFCE8"; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = "#F97316"; ctx.stroke();
+
+    ctx.font = `800 16px ${FONT_KR}`;
+    ctx.fillStyle = "#000";
+    const tipLines = [
+      "① 가장 어려웠던 낱말의 종류는 무엇인가요?  (이름 / 움직임 / 성질·상태)",
+      `② 틀렸던 낱말 ${wrongLabels.length}개를 공책에 적고, 옆에 기본형(-다)도 함께 적어보세요.`,
+      "③ 같은 종류의 낱말 3개를 직접 떠올려 적어보세요."
+    ];
+    tipLines.forEach((line, i) => {
+      ctx.fillText(line, PADX + 24, y + 22 + i * 32);
+    });
+    y += 130 + 30;
+
+    // ── 푸터 ──
+    ctx.font = `700 13px ${FONT_KR}`;
+    ctx.fillStyle = "#9CA3AF";
+    ctx.fillText("© 2026 GEG 화성(깊이 e끌림)  ·  GEGHS-DEEPE-2026", PADX, y);
+
+    return canvas;
+  }
+
+  /** 캔버스 둥근 사각형 경로 (fill 만 인자로 줄 때만 즉시 채움) */
+  function _roundRect(ctx, x, y, w, h, r, clipFillOnly) {
+    const rr = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + rr, y);
+    ctx.arcTo(x + w, y,     x + w, y + h, rr);
+    ctx.arcTo(x + w, y + h, x,     y + h, rr);
+    ctx.arcTo(x,     y + h, x,     y,     rr);
+    ctx.arcTo(x,     y,     x + w, y,     rr);
+    ctx.closePath();
+  }
+
+  /** 섹션 제목 그리기 (왼쪽 작은 박스 + 제목 텍스트) */
+  function _sectionTitle(ctx, text, padX, y, W, font) {
+    ctx.font = `900 20px ${font}`;
+    ctx.fillStyle = "#1F2937";
+    ctx.fillText(text, padX, y);
+
+    // 밑줄
+    ctx.beginPath();
+    ctx.moveTo(padX, y + 30);
+    ctx.lineTo(W - padX, y + 30);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#E5E7EB";
+    ctx.stroke();
+  }
+
+  /* =========================================================================
+     일반 모달 / 활동 안내 / 시간 제한 모달 핸들러
+     ========================================================================= */
+  document.getElementById("btnEndNow").onclick = renderResult;
+  document.getElementById("btnContinue").onclick = () => {
+    document.getElementById("timeModal").classList.remove("open");
+    stopTimer();
+    toast("남은 문제를 끝까지 풀어보세요!");
+  };
+  document.getElementById("btnHelp").onclick = () => document.getElementById("helpModal").classList.add("open");
+  document.getElementById("btnCloseHelp").onclick = () => document.getElementById("helpModal").classList.remove("open");
+
+  // 피드백 모달에서 Enter / Space 로 다음 진행
+  document.addEventListener("keydown", (e) => {
+    const fbModal = document.getElementById("fbModal");
+    if (!fbModal || !fbModal.classList.contains("open")) return;
+    if (e.key === "Enter" || e.key === " " || e.code === "Space" || e.keyCode === 13 || e.keyCode === 32) {
+      e.preventDefault();
+      e.stopPropagation();
+      const openedAt = Number(fbModal.dataset.openedAt || 0);
+      if (Date.now() - openedAt < 180) return;
+      const btn = document.getElementById("btnFbNext");
+      if (btn && !btn.disabled) btn.click();
+    }
+  }, true);
+
+  // 저장된 학습 계획 복원
+  try {
+    const raw = localStorage.getItem("dict_app_plan_v1");
+    if (raw) state.plan = Object.assign({}, state.plan, JSON.parse(raw).plan);
+  } catch (e) { }
+  state.plan.range = "step";
+
+  renderHome();
+
+  /* =========================================================================
+     로그인 / 학생 명단 / 선생님 설정 / 부트
+     ========================================================================= */
+  (function () {
+    const STUDENT_KEY = "dict_word_app_student_v1";
+    const studentInfo = { num: null, name: null, loggedIn: false };
+    window.__currentStudent = studentInfo;
+
+    const _MODE = window.__APP_MODE;          // 'student' | 'teacher' | 'demo'
+    const _isDemo    = _MODE === "demo";
+    const _isStudent = _MODE === "student";
+
+    /* 학생용 링크로 접속한 경우, '선생님 설정' 버튼은 DOM 에서 완전히 제거한다 */
+    if (_isStudent) {
+      const link = document.getElementById("loginSettingsLink");
+      if (link && link.parentNode) link.parentNode.removeChild(link);
+    }
+
+    /* 체험 모드일 때 학생 입장 화면에 안내 배지/배너 표시 */
+    if (_isDemo) {
+      const pill = document.getElementById("demoPill");
+      const banner = document.getElementById("demoBanner");
+      if (pill) pill.style.display = "inline-block";
+      if (banner) banner.style.display = "block";
+    }
+
+    function loadStudentInfo() {
+      try {
+        const raw = localStorage.getItem(STUDENT_KEY);
+        if (raw) {
+          const data = JSON.parse(raw);
+          if (data && data.num && data.name) {
+            studentInfo.num = data.num;
+            studentInfo.name = data.name;
+            studentInfo.loggedIn = !!data.loggedIn;
+          }
+        }
+      } catch (e) { }
+    }
+    function saveStudentInfo() {
+      try {
+        localStorage.setItem(STUDENT_KEY, JSON.stringify({
+          num: studentInfo.num, name: studentInfo.name, loggedIn: studentInfo.loggedIn
+        }));
+      } catch (e) { }
+    }
+
+    /* ── 학습 결과를 시트로 전송 (학생당 1행 UPSERT) ──
+       · 체험 모드: 시트가 없으므로 호출하지 않고, 안내 토스트를 한 번만 띄운다 */
+    let _resultLogged = false;
+    let _demoNoticeShown = false;
+    function gasLogResult() {
+      if (_isDemo) {
+        // 체험 모드 — 진행 결과는 시트에 저장되지 않는다는 사실을 한 번만 안내
+        if (!_demoNoticeShown) {
+          _demoNoticeShown = true;
+          setTimeout(() => toast("선생님이 자료를 연결하면 시트에 저장돼요"), 400);
+        }
+        return;
+      }
+      if (!getEndpoint() || !studentInfo.loggedIn) return;
+      if (_resultLogged) return;
+      _resultLogged = true;
+      try {
+        const range = state.plan.range || "";
+        const total = Number(state.stats.total) || 0;
+        const correct = Number(state.stats.correct) || 0;
+        const wrong = Number(state.stats.wrong) || 0;
+        const minutes = Number(state.plan.minutes) || 0;
+        const rangeRate = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+        const wrongItems = (state.stats.wrongItems || [])
+          .map((w, i) => `${i + 1}. ${w.prompt} → ${w.correct}`).join(' / ');
+        const wrongItemsTrim = wrongItems.length > 800 ? wrongItems.slice(0, 800) + '…' : wrongItems;
+
+        jsonp("logResult", {
+          num: studentInfo.num, name: studentInfo.name,
+          range: range,
+          rangeRate: String(rangeRate),
+          correct: String(correct), wrong: String(wrong),
+          total: String(total), minutes: String(minutes),
+          wrongItems: wrongItemsTrim
+        }).then(res => { if (res && res.ok) console.log('[기록] 저장 완료'); })
+          .catch(err => console.warn('[기록] 저장 실패', err));
+      } catch (e) { console.warn('[기록] 예외', e); }
+    }
+
+    // renderResult / renderHome / initPractice 래핑 (학습 종료 시 자동 기록)
+    const _origRenderResult = renderResult;
+    renderResult = function () {
+      _resultLogged = false;
+      _origRenderResult.apply(this, arguments);
+      setTimeout(gasLogResult, 200);
+    };
+    try { window.renderResult = renderResult; } catch (e) { }
+
+    const _origRenderHome = renderHome;
+    renderHome = function () { _resultLogged = false; _origRenderHome.apply(this, arguments); };
+    try { window.renderHome = renderHome; } catch (e) { }
+
+    const _origInitPractice = initPractice;
+    initPractice = function () { _resultLogged = false; _origInitPractice.apply(this, arguments); };
+    try { window.initPractice = initPractice; } catch (e) { }
+
+    /* ── 학생 드롭다운 채우기 ── */
+    function populateStudents(list) {
+      const select = document.getElementById("studentSelect");
+      if (!select) return;
+      select.innerHTML = "";
+      const first = document.createElement("option");
+      first.value = "";
+      if (list && list.length > 0) {
+        first.textContent = "학생을 선택하세요";
+        select.appendChild(first);
+        list.forEach(s => {
+          const opt = document.createElement("option");
+          opt.value = `${s.num}|${s.name}`;
+          opt.textContent = `${s.num}번 ${s.name}`;
+          select.appendChild(opt);
+        });
+      } else {
+        first.textContent = "명단이 비어 있어요 (선생님께 문의)";
+        select.appendChild(first);
+      }
+    }
+
+    /* ── 체험 모드용 학생 명단 생성 (학생1~학생30) ── */
+    function buildDemoStudents() {
+      const list = [];
+      for (let i = 1; i <= 30; i++) list.push({ num: String(i), name: '학생' + i });
+      return list;
+    }
+
+    /* ── 선생님 설정 ── */
+    function settingsMsg(text, ok) {
+      const el = document.getElementById("settingsMsg");
+      if (!el) return;
+      el.textContent = text || "";
+      el.style.color = ok === true ? "#16A34A" : ok === false ? "#DC2626" : "#6B7280";
+    }
+    function openSettings(firstTime) {
+      const overlay = document.getElementById("settingsOverlay");
+      const input = document.getElementById("endpointInput");
+      const extra = document.getElementById("settingsExtra");
+      const closeBtn = document.getElementById("btnCloseSettings");
+      const intro = document.getElementById("settingsIntro");
+      if (!overlay) return;
+
+      const ep = getEndpoint();
+      if (input) input.value = ep || "";
+      const hasEp = !!ep;
+      if (extra) extra.style.display = hasEp ? "flex" : "none";
+      if (closeBtn) closeBtn.style.display = (hasEp && !firstTime) ? "inline-flex" : "none";
+      if (hasEp) {
+        const linkInput = document.getElementById("studentLink");
+        if (linkInput) linkInput.value = buildStudentLink();
+      }
+      if (intro) {
+        intro.textContent = firstTime
+          ? "선생님께 받은 연결 주소를 붙여넣어 주세요."
+          : "연결 주소를 바꾸거나 학생용 링크를 복사할 수 있어요.";
+      }
+      settingsMsg("", null);
+      overlay.style.display = "flex";
+    }
+    function hideSettings() {
+      const overlay = document.getElementById("settingsOverlay");
+      if (overlay) overlay.style.display = "none";
+    }
+
+    /* ── 서버(시트)에서 명단·문제 불러오기 ── */
+    function loadServerData() {
+      settingsMsg("", null);
+      jsonp("getStudentList", {})
+        .then(res => {
+          populateStudents((res && res.list) || []);
+          return jsonp("getQuestions", {});
+        })
+        .then(res => {
+          if (res && res.ok) applyServerQuestions(res);
+          showLoginOrResume();
+        })
+        .catch(err => {
+          // 학생용 링크 모드에서 연결 실패 시 — 안내만 띄우고 체험 모드로 강등
+          if (_isStudent) {
+            toast("자료를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.");
+            populateStudents(buildDemoStudents());
+            showLoginOrResume();
+          } else {
+            openSettings(false);
+            settingsMsg("연결 주소에 접속하지 못했어요. 주소와 배포 설정(액세스: 모든 사용자)을 확인해 주세요.", false);
+            console.warn(err);
+          }
+        });
+    }
+
+    function showLoginOrResume() {
+      const overlay = document.getElementById("loginOverlay");
+      loadStudentInfo();
+      if (studentInfo.loggedIn && studentInfo.num && studentInfo.name) {
+        if (overlay) overlay.style.display = "none";
+        addLogoutButton();
+        // 체험 모드 + 진행 중 데이터가 있으면 이어서 풀지 묻는다
+        if (_isDemo) maybeOfferResume();
+      } else {
+        if (overlay) overlay.style.display = "flex";
+      }
+    }
+
+    /* ── 체험 모드 이어풀기 안내 (확인 모달 재사용) ── */
+    function maybeOfferResume() {
+      const snap = loadDemoProgress();
+      if (!snap || !snap.queue || !snap.queue.length) return;
+      // 결과 화면까지 완료된 데이터(혹은 pointer가 끝난 데이터)는 무시
+      if (snap.pointer >= snap.queue.length) { clearDemoProgress(); return; }
+
+      const ct = document.getElementById("confirmText");
+      if (ct) ct.innerHTML = "이전에 풀던 학습이 남아 있어요.<br>이어서 풀까요?";
+      const yes = document.getElementById("btnConfirmYes");
+      const no  = document.getElementById("btnConfirmNo");
+      yes.textContent = "이어서 풀기";
+      no.textContent  = "처음부터";
+      confirmModal.classList.add("open");
+
+      yes.onclick = () => {
+        confirmModal.classList.remove("open");
+        try {
+          state.plan       = snap.plan || state.plan;
+          state.queue      = snap.queue || [];
+          state.pointer    = Math.max(0, Math.min(snap.pointer || 0, state.queue.length - 1));
+          state.stats      = snap.stats || createInitialStats(state.queue.length);
+          state.retryMode  = !!snap.retryMode;
+          state.originalSession = snap.originalSession || null;
+          state.attempts   = 0;
+          state.screen     = "practice";
+          startTimer();
+          renderQuestion();
+          toast("이어서 풀이를 시작할게요!");
+        } catch (e) {
+          console.warn("[resume] 복원 실패", e);
+          clearDemoProgress();
+        }
+        // 다음 호출을 위해 버튼 라벨 원복
+        yes.textContent = "네";
+        no.textContent  = "아니오";
+        // 기본 핸들러 복원
+        yes.onclick = _defaultConfirmYes;
+        no.onclick  = _defaultConfirmNo;
+      };
+      no.onclick = () => {
+        confirmModal.classList.remove("open");
+        clearDemoProgress();
+        yes.textContent = "네";
+        no.textContent  = "아니오";
+        yes.onclick = _defaultConfirmYes;
+        no.onclick  = _defaultConfirmNo;
+      };
+    }
+    // 기본 확인 모달 핸들러를 변수에 저장 (이어풀기 안내가 끝나면 복원하기 위함)
+    const _defaultConfirmYes = document.getElementById("btnConfirmYes").onclick;
+    const _defaultConfirmNo  = document.getElementById("btnConfirmNo").onclick;
+
+    /* ── 로그인 컨트롤 ── */
+    function initLoginControls() {
+      const select = document.getElementById("studentSelect");
+      const btnLogin = document.getElementById("btnLogin");
+      const errMsg = document.getElementById("loginError");
+      const overlay = document.getElementById("loginOverlay");
+
+      try {
+        const qs = new URLSearchParams(window.location.search);
+        if (qs.get("reset") === "1" || qs.get("logout") === "1") {
+          localStorage.removeItem(STUDENT_KEY);
+        }
+      } catch (e) { }
+
+      if (btnLogin) {
+        btnLogin.onclick = () => {
+          const val = select ? select.value : "";
+          if (!val) { if (errMsg) errMsg.classList.remove("hidden"); return; }
+          const idx = val.indexOf("|");
+          const num = idx >= 0 ? val.slice(0, idx) : val;
+          const name = idx >= 0 ? val.slice(idx + 1) : "";
+          if (errMsg) errMsg.classList.add("hidden");
+
+          studentInfo.num = num;
+          studentInfo.name = name;
+          studentInfo.loggedIn = true;
+          saveStudentInfo();
+          if (overlay) overlay.style.display = "none";
+          addLogoutButton();
+
+          // 체험 모드 + 이어풀기 안내
+          if (_isDemo) maybeOfferResume();
+        };
+      }
+    }
+
+    function doLogout() {
+      try { localStorage.removeItem(STUDENT_KEY); } catch (e) { }
+      // 체험 모드의 진행 데이터도 함께 삭제
+      try {
+        const stuRaw = localStorage.getItem(STUDENT_KEY);
+        // (이미 삭제됨)
+      } catch (e) { }
+      location.reload();
+    }
+
+    function addLogoutButton() {
+      if (document.getElementById("btnLogoutBadge")) return;
+      const badge = document.createElement("div");
+      badge.id = "btnLogoutBadge";
+      badge.style.cssText = 'display:flex;align-items:center;gap:6px;background:#fff;border:3px solid #000;border-radius:14px;box-shadow:3px 3px 0 #000;padding:6px 10px;font-weight:900;font-size:13px;cursor:pointer;user-select:none;white-space:nowrap;';
+      badge.innerHTML = `<span style="color:#6366F1;">👤 ${studentInfo.num}번 ${studentInfo.name}</span><span style="color:#9CA3AF;">|</span><span style="color:#F97316;">로그아웃</span>`;
+      badge.title = "클릭하면 로그아웃합니다";
+      badge.onclick = () => {
+        const ct = document.getElementById("confirmText");
+        if (ct) ct.innerHTML = "로그아웃하시겠어요?<br>다음 접속 시 다시 학생을 선택해야 합니다.";
+        confirmModal.classList.add("open");
+        const yes = document.getElementById("btnConfirmYes");
+        const no  = document.getElementById("btnConfirmNo");
+        yes.onclick = () => { confirmModal.classList.remove("open"); doLogout(); };
+        no.onclick  = () => {
+          confirmModal.classList.remove("open");
+          yes.onclick = _defaultConfirmYes;
+          no.onclick  = _defaultConfirmNo;
+        };
+      };
+      const headerActions = document.getElementById("headerActions");
+      if (headerActions) headerActions.appendChild(badge);
+      else document.body.appendChild(badge);
+    }
+
+    /* ── 선생님 설정 버튼 ── */
+    function wireSettings() {
+      const loginSettingsLink = document.getElementById("loginSettingsLink");
+      const btnSave  = document.getElementById("btnSaveEndpoint");
+      const btnClose = document.getElementById("btnCloseSettings");
+      const btnCopy  = document.getElementById("btnCopyLink");
+      const btnClear = document.getElementById("btnClearEndpoint");
+
+      if (loginSettingsLink) loginSettingsLink.onclick = (e) => { e.preventDefault(); openSettings(false); };
+      if (btnClose) btnClose.onclick = () => hideSettings();
+
+      if (btnSave) {
+        btnSave.onclick = () => {
+          const input = document.getElementById("endpointInput");
+          const url = (input ? input.value : "").trim();
+          if (!isLikelyEndpoint(url)) {
+            settingsMsg("주소 형식이 올바르지 않아요. https로 시작하고 /exec로 끝나는 주소를 붙여넣어 주세요.", false);
+            return;
+          }
+          setEndpoint(url);
+          // 주소를 저장했으므로 이 페이지는 더 이상 체험 모드가 아님
+          window.__APP_MODE = "teacher";
+
+          const extra = document.getElementById("settingsExtra");
+          if (extra) extra.style.display = "flex";
+          const closeBtn = document.getElementById("btnCloseSettings");
+          if (closeBtn) closeBtn.style.display = "inline-flex";
+          const linkInput = document.getElementById("studentLink");
+          if (linkInput) linkInput.value = buildStudentLink();
+
+          settingsMsg("연결 확인 중…", null);
+          jsonp("ping", {})
+            .then(res => {
+              if (res && res.ok) {
+                settingsMsg("연결되었어요! 명단을 불러옵니다…", true);
+                // 체험 모드 안내 배지 / 배너 숨기기
+                const pill = document.getElementById("demoPill");
+                const banner = document.getElementById("demoBanner");
+                if (pill) pill.style.display = "none";
+                if (banner) banner.style.display = "none";
+                loadServerData();
+                setTimeout(hideSettings, 700);
+              } else {
+                settingsMsg("주소는 저장했지만 응답을 확인하지 못했어요. 배포 설정을 확인해 주세요.", false);
+              }
+            })
+            .catch(() => {
+              settingsMsg("주소는 저장했어요. 다만 지금은 응답이 없어요. 주소·배포 설정(액세스: 모든 사용자)을 확인해 주세요.", false);
+            });
+        };
+      }
+
+      if (btnCopy) {
+        btnCopy.onclick = () => {
+          const linkInput = document.getElementById("studentLink");
+          const link = linkInput ? linkInput.value : buildStudentLink();
+          if (!link) { settingsMsg("먼저 연결 주소를 저장해 주세요.", false); return; }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(link)
+              .then(() => settingsMsg("학생용 링크를 복사했어요! 학생들에게 전달하세요.", true))
+              .catch(() => { if (linkInput) linkInput.select(); settingsMsg("복사가 안 되면 위 링크를 길게 눌러 복사하세요.", null); });
+          } else {
+            if (linkInput) linkInput.select();
+            settingsMsg("위 링크를 길게 눌러 복사하세요.", null);
+          }
+        };
+      }
+
+      if (btnClear) {
+        btnClear.onclick = () => {
+          const ct = document.getElementById("confirmText");
+          if (ct) ct.innerHTML = "연결을 해제하면 이 기기에서 저장된 주소가 지워집니다.<br>계속할까요?";
+          confirmModal.classList.add("open");
+          const yes = document.getElementById("btnConfirmYes");
+          const no  = document.getElementById("btnConfirmNo");
+          yes.onclick = () => { confirmModal.classList.remove("open"); clearEndpointStore(); location.reload(); };
+          no.onclick  = () => {
+            confirmModal.classList.remove("open");
+            yes.onclick = _defaultConfirmYes;
+            no.onclick  = _defaultConfirmNo;
+          };
+        };
+      }
+    }
+
+    /* ── 부트 ── */
+    function boot() {
+      wireSettings();
+      initLoginControls();
+
+      if (_isStudent) {
+        // 학생용 링크로 접속 — 메모리에 있는 주소로 명단·문제만 불러온다
+        const select = document.getElementById("studentSelect");
+        if (select) select.innerHTML = '<option value="">불러오는 중…</option>';
+        loadServerData();
+      } else if (_isDemo) {
+        // 체험 모드 — 학생1~30 자동 채우기
+        populateStudents(buildDemoStudents());
+        showLoginOrResume();
+      } else {
+        // 교사/저장 모드 — 시트에서 불러오기
+        const select = document.getElementById("studentSelect");
+        if (select) select.innerHTML = '<option value="">불러오는 중…</option>';
+        loadServerData();
+      }
+    }
+
+    boot();
+  })();
+</script>
+
+<script>
+/* 체험 모드 안내 배너 (전 앱 일관) */
+(function(){
+  function isDemo(){
+    try{
+      if(/[#&]c=/.test(location.hash||'')) return false;
+      for(var j=0;j<localStorage.length;j++){ var k=localStorage.key(j)||''; if(/exec|gasurl|serverurl|sheet_api|gas_exec|appserverurl|endpoint/i.test(k) && localStorage.getItem(k)) return false; }
+      return true;
+    }catch(e){ return true; }
+  }
+  function show(){
+    if(document.getElementById('__demoBar')) return;
+    if(!isDemo()) return;
+    var bar=document.createElement('div'); bar.id='__demoBar';
+    bar.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#1f2937;color:#fff;font-size:13px;line-height:1.45;padding:9px 38px calc(9px + env(safe-area-inset-bottom)) 14px;text-align:center;font-family:sans-serif;box-shadow:0 -2px 10px rgba(0,0,0,0.25);';
+    bar.innerHTML='체험 모드예요 · 활동 기록은 이 기기에만 저장돼요(이어하기 가능). 선생님이 구글 시트를 연결하면 시트에 저장됩니다.';
+    var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','닫기'); x.textContent='✕';
+    x.style.cssText='position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:16px;line-height:1;cursor:pointer;padding:6px;';
+    x.onclick=function(){ try{ bar.remove(); }catch(e){ bar.style.display='none'; } };
+    bar.appendChild(x);
+    document.body.appendChild(bar);
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', show); } else { show(); }
+})();
+</script>
+</body>
+
+</html>
